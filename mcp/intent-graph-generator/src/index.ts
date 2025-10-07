@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// Load environment variables from .env file
+import { config } from 'dotenv';
+config();
+
 /**
  * IntentGraph MCP Server
  * Main entry point for the Model Context Protocol server

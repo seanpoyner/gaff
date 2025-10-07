@@ -81,7 +81,7 @@ C:\Users\seanp\AppData\Roaming\Claude\claude_desktop_config.json
 **Step 2:** Test the API key manually:
 
 ```powershell
-$apiKey = "QgHlXliVl8XxeqnEB9pix66cme6Rmufi"
+$apiKey = "your-writer-api-key-here"
 $headers = @{
     'Authorization' = "Bearer $apiKey"
     'Content-Type' = 'application/json'
@@ -207,7 +207,7 @@ Before using in Claude Desktop, test the MCP server locally to isolate the issue
 **Step 1:** Set environment variables:
 
 ```powershell
-$env:LLM_API_KEY = "QgHlXliVl8XxeqnEB9pix66cme6Rmufi"
+$env:LLM_API_KEY = "your-writer-api-key-here"
 $env:LLM_MODEL = "palmyra-x5"
 $env:LLM_BASE_URL = "https://api.writer.com"
 ```

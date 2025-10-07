@@ -7,6 +7,7 @@
 import { spawn, ChildProcess } from 'child_process';
 import { resolve, dirname } from 'path';
 import { fileURLToPath } from 'url';
+import { readFileSync } from 'fs';
 import type { CallToolResult } from '@modelcontextprotocol/sdk/types.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -25,9 +26,43 @@ interface ServerConfig {
 export class ServerRouter {
   private servers: Map<string, ChildProcess> = new Map();
   private serverConfigs: ServerConfig[] = [];
+  private llmEnv: Record<string, string> = {};
   
   constructor() {
+    this.loadGaffConfig();
     this.initializeServerConfigs();
+  }
+  
+  /**
+   * Load LLM configuration from gaff.json in the current working directory
+   */
+  private loadGaffConfig() {
+    try {
+      const gaffJsonPath = resolve(process.cwd(), 'gaff.json');
+      console.error(`[GAFF Gateway] Looking for gaff.json at: ${gaffJsonPath}`);
+      
+      const gaffConfig = JSON.parse(readFileSync(gaffJsonPath, 'utf-8'));
+      
+      // Extract LLM configuration from models.primary_llm
+      if (gaffConfig.models?.primary_llm) {
+        const llm = gaffConfig.models.primary_llm;
+        const apiKeyEnv = llm.api_key_env || 'WRITER_API_KEY';
+        const apiKey = process.env[apiKeyEnv];
+        
+        if (apiKey) {
+          this.llmEnv['LLM_API_KEY'] = apiKey;
+          this.llmEnv['WRITER_API_KEY'] = apiKey;
+          this.llmEnv['LLM_BASE_URL'] = llm.base_url || 'https://api.writer.com';
+          this.llmEnv['LLM_MODEL'] = llm.model || 'palmyra-x5';
+          console.error(`[GAFF Gateway] Loaded LLM config: ${llm.provider} ${llm.model}`);
+        } else {
+          console.error(`[GAFF Gateway] WARNING: ${apiKeyEnv} not found in environment`);
+        }
+      }
+    } catch (error) {
+      console.error(`[GAFF Gateway] Could not load gaff.json: ${error}`);
+      console.error(`[GAFF Gateway] Using environment variables directly if available`);
+    }
   }
   
   /**
@@ -191,11 +226,18 @@ export class ServerRouter {
       }, 30000);
       
       try {
+        // Merge LLM config from gaff.json with process.env
+        const childEnv = { ...process.env, ...this.llmEnv };
+        
+        // Debug: Log environment variable status
+        console.error(`[DEBUG] Spawning ${serverConfig.name} with LLM_API_KEY: ${childEnv.LLM_API_KEY ? 'SET' : 'NOT SET'}`);
+        console.error(`[DEBUG] WRITER_API_KEY: ${childEnv.WRITER_API_KEY ? 'SET' : 'NOT SET'}`);
+        
         // Spawn the child MCP server
         // On Windows, we need shell: true to properly resolve .cmd files like npx.cmd
         const child = spawn(serverConfig.command, serverConfig.args, {
           stdio: ['pipe', 'pipe', 'pipe'],
-          env: process.env,
+          env: childEnv,
           shell: true, // Required for Windows to find npx.cmd
         });
         

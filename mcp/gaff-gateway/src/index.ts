@@ -1,5 +1,9 @@
 #!/usr/bin/env node
 
+// Load environment variables from .env file
+import { config } from 'dotenv';
+config();
+
 /**
  * GAFF Gateway - Unified Entry Point to All GAFF MCP Servers
  * 

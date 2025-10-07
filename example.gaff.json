@@ -1,0 +1,476 @@
+{
+  "_comment": "EXAMPLE CONFIGURATION FILE - Copy this to gaff.json and customize for your project",
+  "_setup_instructions": [
+    "1. Copy this file to gaff.json in your project directory",
+    "2. Set WRITER_API_KEY environment variable with your API key",
+    "3. Customize agents, models, and settings for your use case",
+    "4. Run 'gaff start' to launch the GAFF gateway"
+  ],
+  
+  "version": "1.0.0",
+  "name": "GAFF Example Configuration",
+  "description": "Example GAFF configuration demonstrating agent orchestration patterns",
+  
+  "primary_agent": {
+    "name": "Primary Orchestrator",
+    "type": "custom",
+    "description": "Primary agent that interacts with users and coordinates workflows",
+    "mcp_servers": [
+      "agent-orchestration",
+      "safety-protocols",
+      "intent-graph-generator",
+      "gaff-tools",
+      "quality-check",
+      "router",
+      "memory"
+    ],
+    "memory_enabled": true,
+    "conversation_context_window": 10
+  },
+
+  "agents": {
+    "InputValidator": {
+      "type": "validator",
+      "description": "Validates input data for completeness, format, and security",
+      "capabilities": [
+        "schema_validation",
+        "security_check",
+        "data_sanitization",
+        "format_verification"
+      ],
+      "endpoint": "http://localhost:8001/validate",
+      "authentication": "api_key",
+      "timeout_ms": 5000,
+      "retry_policy": {
+        "max_attempts": 3,
+        "backoff_strategy": "exponential"
+      },
+      "input_schema": {
+        "data": "object",
+        "schema": "object",
+        "strict": "boolean"
+      },
+      "output_schema": {
+        "is_valid": "boolean",
+        "errors": "array",
+        "sanitized_data": "object"
+      }
+    },
+
+    "DataAnalyzer": {
+      "type": "llm",
+      "description": "Analyzes data using LLM for insights, patterns, and classification",
+      "capabilities": [
+        "data_classification",
+        "pattern_recognition",
+        "insight_generation",
+        "trend_analysis"
+      ],
+      "model": "palmyra-x5",
+      "temperature": 0.3,
+      "timeout_ms": 10000,
+      "input_schema": {
+        "data": "object",
+        "analysis_type": "string",
+        "context": "string"
+      },
+      "output_schema": {
+        "analysis": "string",
+        "confidence": "number",
+        "insights": "array",
+        "classifications": "object"
+      }
+    },
+
+    "DataFetcher": {
+      "type": "api",
+      "description": "Fetches data from external APIs and data sources",
+      "capabilities": [
+        "rest_api_calls",
+        "data_retrieval",
+        "pagination_handling",
+        "rate_limit_management"
+      ],
+      "endpoint": "http://localhost:8002/fetch",
+      "authentication": "api_key",
+      "timeout_ms": 15000,
+      "input_schema": {
+        "url": "string",
+        "method": "string",
+        "headers": "object",
+        "params": "object"
+      },
+      "output_schema": {
+        "data": "object",
+        "status_code": "number",
+        "response_time_ms": "number"
+      }
+    },
+
+    "DataTransformer": {
+      "type": "transformer",
+      "description": "Transforms data between different formats and structures",
+      "capabilities": [
+        "format_conversion",
+        "schema_mapping",
+        "data_enrichment",
+        "normalization"
+      ],
+      "endpoint": "http://localhost:8003/transform",
+      "authentication": "none",
+      "timeout_ms": 8000,
+      "input_schema": {
+        "data": "object",
+        "source_format": "string",
+        "target_format": "string",
+        "mapping": "object"
+      },
+      "output_schema": {
+        "transformed_data": "object",
+        "format": "string"
+      }
+    },
+
+    "DecisionRouter": {
+      "type": "router",
+      "description": "Routes requests based on conditions and business logic",
+      "capabilities": [
+        "conditional_routing",
+        "load_balancing",
+        "priority_routing",
+        "fallback_handling"
+      ],
+      "endpoint": "http://localhost:8004/route",
+      "authentication": "none",
+      "timeout_ms": 3000,
+      "input_schema": {
+        "request": "object",
+        "routing_rules": "array",
+        "context": "object"
+      },
+      "output_schema": {
+        "route": "string",
+        "reason": "string",
+        "confidence": "number"
+      }
+    },
+
+    "Aggregator": {
+      "type": "aggregator",
+      "description": "Aggregates and combines results from multiple sources",
+      "capabilities": [
+        "result_merging",
+        "conflict_resolution",
+        "weighted_aggregation",
+        "consensus_building"
+      ],
+      "endpoint": "http://localhost:8005/aggregate",
+      "authentication": "none",
+      "timeout_ms": 5000,
+      "input_schema": {
+        "results": "array",
+        "aggregation_strategy": "string",
+        "weights": "object"
+      },
+      "output_schema": {
+        "aggregated_result": "object",
+        "confidence": "number",
+        "sources_used": "array"
+      }
+    },
+
+    "NotificationService": {
+      "type": "api",
+      "description": "Sends notifications through multiple channels",
+      "capabilities": [
+        "email_notification",
+        "webhook_delivery",
+        "multi_channel_delivery",
+        "delivery_confirmation"
+      ],
+      "endpoint": "http://localhost:8006/notify",
+      "authentication": "api_key",
+      "timeout_ms": 10000,
+      "input_schema": {
+        "recipient": "string",
+        "message": "string",
+        "channels": "array",
+        "priority": "string"
+      },
+      "output_schema": {
+        "notification_id": "string",
+        "delivery_status": "string",
+        "channels_used": "array"
+      }
+    },
+
+    "QualityChecker": {
+      "type": "validator",
+      "description": "Validates quality of executed workflow results and triggers reruns if needed",
+      "capabilities": [
+        "result_validation",
+        "quality_scoring",
+        "completeness_check",
+        "accuracy_verification",
+        "rerun_triggering"
+      ],
+      "endpoint": "http://localhost:8007/quality-check",
+      "authentication": "none",
+      "timeout_ms": 8000,
+      "input_schema": {
+        "execution_result": "object",
+        "quality_criteria": "object",
+        "intent_graph": "object",
+        "original_request": "object"
+      },
+      "output_schema": {
+        "quality_score": "number",
+        "is_acceptable": "boolean",
+        "issues": "array",
+        "rerun_required": "boolean",
+        "rerun_nodes": "array",
+        "recommendations": "array"
+      }
+    },
+
+    "ErrorHandler": {
+      "type": "transformer",
+      "description": "Handles errors and generates appropriate responses",
+      "capabilities": [
+        "error_classification",
+        "recovery_strategy_selection",
+        "user_friendly_messages",
+        "error_logging"
+      ],
+      "endpoint": "http://localhost:8008/error-handling",
+      "authentication": "none",
+      "timeout_ms": 5000,
+      "input_schema": {
+        "error": "object",
+        "context": "object",
+        "user_facing": "boolean"
+      },
+      "output_schema": {
+        "handled_error": "object",
+        "user_message": "string",
+        "recovery_action": "string",
+        "should_retry": "boolean"
+      }
+    }
+  },
+
+  "models": {
+    "primary_llm": {
+      "provider": "writer",
+      "model": "palmyra-x5",
+      "api_key_env": "WRITER_API_KEY",
+      "base_url": "https://api.writer.com",
+      "temperature": 0.7,
+      "max_tokens": 4000,
+      "top_p": 0.9
+    },
+    "fallback_llm": {
+      "provider": "openai",
+      "model": "gpt-4",
+      "api_key_env": "OPENAI_API_KEY",
+      "temperature": 0.7,
+      "max_tokens": 4000
+    },
+    "fast_llm": {
+      "provider": "anthropic",
+      "model": "claude-3-5-sonnet-20241022",
+      "api_key_env": "ANTHROPIC_API_KEY",
+      "temperature": 0.3,
+      "max_tokens": 2000
+    }
+  },
+
+  "protocols": {
+    "mcp_version": "1.0.4",
+    "transport": "stdio",
+    "http_fallback": true,
+    "http_port": 3100,
+    "memory_mcp": {
+      "enabled": true,
+      "url": "http://localhost:3100",
+      "persistence": "in-memory"
+    },
+    "cors": {
+      "enabled": true,
+      "allowed_origins": [
+        "http://localhost:3000",
+        "http://localhost:8080"
+      ]
+    }
+  },
+
+  "schemas": {
+    "orchestration_card": "./schemas/orchestration-card-schema.json",
+    "intent_graph": "./schemas/intent-graph-schema.json",
+    "gaff_config": "./schemas/gaff-config-schema.json",
+    "safety_policy": "./schemas/safety-policy-schema.json"
+  },
+
+  "context": {
+    "organization": "GAFF Open Source Project",
+    "domain": "general",
+    "use_cases": [
+      "data_processing_workflows",
+      "api_orchestration",
+      "multi_agent_coordination",
+      "automated_decision_making",
+      "quality_assured_processing"
+    ],
+    "compliance": [
+      "GDPR",
+      "CCPA",
+      "SOC2"
+    ]
+  },
+
+  "constraints": {
+    "max_graph_nodes": 50,
+    "max_graph_depth": 10,
+    "max_execution_time_ms": 300000,
+    "max_cost_per_execution": 10.0,
+    "max_concurrent_executions": 100,
+    "max_retries": 3,
+    "rate_limits": {
+      "requests_per_minute": 1000,
+      "requests_per_hour": 50000
+    }
+  },
+
+  "quality_assurance": {
+    "enabled": true,
+    "auto_rerun_on_failure": true,
+    "max_rerun_attempts": 2,
+    "quality_threshold": 0.85,
+    "validation_rules": [
+      "completeness_check",
+      "accuracy_verification",
+      "consistency_check",
+      "format_validation"
+    ],
+    "rerun_strategies": {
+      "partial": "Rerun only failed nodes",
+      "full": "Rerun entire workflow",
+      "adaptive": "Intelligently decide based on failure type"
+    },
+    "default_strategy": "adaptive"
+  },
+
+  "safety_protocols": {
+    "enabled": true,
+    "guardrails": {
+      "input_validation": {
+        "enabled": true,
+        "max_input_size_mb": 10,
+        "allowed_content_types": ["text", "json", "xml"],
+        "block_suspicious_patterns": true
+      },
+      "output_validation": {
+        "enabled": true,
+        "pii_detection": true,
+        "content_filtering": true,
+        "schema_enforcement": true
+      },
+      "execution_limits": {
+        "max_nodes_per_graph": 50,
+        "max_execution_time_ms": 300000,
+        "max_memory_mb": 1024,
+        "max_api_calls_per_execution": 100
+      }
+    },
+    "compliance_checks": {
+      "data_privacy": {
+        "enabled": true,
+        "regulations": ["GDPR", "CCPA"],
+        "pii_handling": "mask",
+        "data_retention_days": 90
+      },
+      "security": {
+        "enabled": true,
+        "encryption_required": true,
+        "authentication_required": true,
+        "audit_logging": true
+      },
+      "rate_limiting": {
+        "enabled": true,
+        "per_user": 100,
+        "per_ip": 1000,
+        "per_endpoint": 10000
+      }
+    },
+    "policy_enforcement": {
+      "block_on_violation": true,
+      "log_violations": true,
+      "notify_on_violation": true,
+      "violation_cooldown_minutes": 15
+    }
+  },
+
+  "instructions": {
+    "default_behavior": "Always validate inputs before processing. Log all operations. Handle errors gracefully with informative messages.",
+    
+    "optimization_preference": "balanced",
+    
+    "security_requirements": [
+      "Authenticate all external API calls",
+      "Encrypt sensitive data",
+      "Mask PII in logs",
+      "Implement rate limiting",
+      "Use least privilege access"
+    ],
+    
+    "error_handling": [
+      "Retry transient failures with exponential backoff",
+      "Log all errors with context",
+      "Provide user-friendly error messages",
+      "Escalate critical failures"
+    ],
+    
+    "logging": {
+      "level": "info",
+      "include_pii": false,
+      "include_request_body": true,
+      "include_response_body": false
+    },
+
+    "agent_selection": {
+      "strategy": "capability_based",
+      "fallback_strategy": "best_effort",
+      "prefer_local_agents": true
+    },
+
+    "graph_generation": {
+      "include_error_handling": true,
+      "include_retry_logic": true,
+      "prefer_parallel_execution": true,
+      "generate_fallback_paths": true,
+      "include_quality_checks": true
+    },
+
+    "quality_assurance": {
+      "validate_all_results": true,
+      "use_quality_agent": true,
+      "auto_rerun_threshold": 0.85,
+      "log_quality_metrics": true
+    }
+  },
+
+  "metadata": {
+    "created_at": "2025-10-06T12:00:00Z",
+    "created_by": "GAFF Open Source",
+    "version": "1.0.0",
+    "last_updated": "2025-10-06T12:00:00Z",
+    "environment": "development",
+    "tags": [
+      "orchestration",
+      "open-source",
+      "mcp",
+      "quality-assured",
+      "safe-ai"
+    ]
+  }
+}

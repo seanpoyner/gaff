@@ -1,6 +1,6 @@
 {
   "name": "gaff-gateway",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "GAFF Gateway - Single entry point to all GAFF MCP servers with unified tool access",
   "type": "module",
   "main": "build/index.js",

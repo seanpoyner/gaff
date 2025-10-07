@@ -161,7 +161,7 @@ class GaffGateway {
       // AGENT-ORCHESTRATION TOOLS
       // ========================================
       {
-        name: "orchestration_generate_orchestration_card",
+        name: "orchestration_generate_card",
         description: "[ORCHESTRATION] Convert natural language query to orchestration card using gaff.json agents",
         inputSchema: {
           type: "object",
@@ -189,7 +189,7 @@ class GaffGateway {
       // INTENT-GRAPH-GENERATOR TOOLS
       // ========================================
       {
-        name: "graph_generate_intent_graph",
+        name: "graph_generate",
         description: "[GRAPH] Generate intent graph from orchestration card using AI",
         inputSchema: {
           type: "object",
@@ -209,7 +209,7 @@ class GaffGateway {
       },
       
       {
-        name: "graph_visualize_graph",
+        name: "graph_visualize",
         description: "[GRAPH] Generate Mermaid diagram visualization of an intent graph",
         inputSchema: {
           type: "object",

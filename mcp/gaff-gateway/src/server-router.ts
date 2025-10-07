@@ -160,7 +160,18 @@ export class ServerRouter {
     toolName: string,
     args: any
   ): Promise<CallToolResult> {
-    const toolBaseName = toolName.replace(serverConfig.toolPrefix, '');
+    let toolBaseName = toolName.replace(serverConfig.toolPrefix, '');
+    
+    // Special mapping for tools where gateway name doesn't match server name
+    const toolMappings: Record<string, string> = {
+      'visualize': 'visualize_graph',
+      'generate': 'generate_intent_graph',
+      'generate_card': 'generate_orchestration_card'
+    };
+    
+    if (toolMappings[toolBaseName]) {
+      toolBaseName = toolMappings[toolBaseName];
+    }
     
     return new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {

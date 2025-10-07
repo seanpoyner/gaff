@@ -295,10 +295,17 @@ class GaffGateway {
         inputSchema: {
           type: "object",
           properties: {
-            data: { type: "object", description: "Data to check" },
-            guardrail_types: { type: "array", items: { type: "string" }, description: "Types of guardrails to apply" }
+            content: { type: "string", description: "Content to check for safety violations" },
+            guardrail_types: { 
+              type: "array", 
+              items: { 
+                type: "string",
+                enum: ["pii_detection", "content_filtering", "risk_assessment"]
+              }, 
+              description: "Types of guardrails to enforce" 
+            }
           },
-          required: ["data"]
+          required: ["content", "guardrail_types"]
         }
       },
       

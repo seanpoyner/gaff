@@ -12,7 +12,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 export interface ExecutionState {
   execution_id: string;
-  status: 'running' | 'paused_for_approval' | 'completed' | 'failed' | 'cancelled';
+  status: 'running' | 'paused_for_approval' | 'completed' | 'failed' | 'failed_quality' | 'cancelled';
   graph: any;
   current_node: string | null;
   completed_nodes: string[];

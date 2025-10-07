@@ -396,6 +396,45 @@ export interface SystemConfiguration {
   validation_rules?: string[];
 }
 
+export interface QualityRequirements {
+  enabled?: boolean;
+  required_fields?: string[];
+  accuracy_threshold?: number;
+  completeness_required?: boolean;
+  performance_sla_ms?: number;
+  auto_validate?: boolean;
+  rerun_strategy?: "none" | "partial" | "full" | "adaptive";
+  max_rerun_attempts?: number;
+  scoring_weights?: {
+    completeness_weight?: number;
+    accuracy_weight?: number;
+    performance_weight?: number;
+  };
+}
+
+export interface SafetyRequirements {
+  enabled?: boolean;
+  compliance_standards?: ("GDPR" | "CCPA" | "PCI-DSS" | "SOC2" | "HIPAA" | "ISO27001")[];
+  guardrails?: {
+    pii_detection?: boolean;
+    content_filtering?: boolean;
+    rate_limiting?: boolean;
+  };
+  input_validation?: {
+    max_size_bytes?: number;
+    allowed_formats?: string[];
+    required_fields?: string[];
+    sanitize_input?: boolean;
+  };
+  output_validation?: {
+    mask_pii?: boolean;
+    sanitize_output?: boolean;
+    required_fields?: string[];
+  };
+  audit_logging?: boolean;
+  encryption_required?: boolean;
+}
+
 export interface OrchestrationCard {
   user_request: OrchestrationUserRequest;
   available_agents: OrchestrationAgent[];
@@ -404,9 +443,11 @@ export interface OrchestrationCard {
   constraints?: OrchestrationConstraints;
   context?: OrchestrationContext;
   preferences?: OrchestrationPreferences;
-  special_requirements?: string[];
+  special_requirements?: string[]; // DEPRECATED: Use quality_requirements and safety_requirements
+  quality_requirements?: QualityRequirements;
+  safety_requirements?: SafetyRequirements;
   example_scenarios?: OrchestrationExampleScenario[];
-  system_configuration?: SystemConfiguration; // NEW: System-specific configuration
+  system_configuration?: SystemConfiguration;
 }
 
 export type GenerationMode = 'delegate_to_caller' | 'use_configured_api';

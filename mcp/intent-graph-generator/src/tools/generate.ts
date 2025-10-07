@@ -12,6 +12,7 @@ import { LLMClient } from '../llm/client.js';
 import { validateGraph } from '../utils.js';
 import { generateMemoryKey } from '../utils/memory.js';
 import { storeGraphInMemory } from '../utils/memory-client.js';
+import { injectQualityAndSafetyNodes } from '../utils/quality-safety-injection.js';
 
 function getEnv(name: string, fallback?: string): string | undefined {
   try {
@@ -75,6 +76,26 @@ export async function generateIntentGraphTool(params: {
       include_artifacts: options?.include_artifacts,
       artifact_types: options?.artifact_types
     });
+
+    // INJECT QUALITY & SAFETY NODES
+    // Auto-inject quality validation and safety protocol nodes based on orchestration card requirements
+    const originalNodeCount = generated.intent_graph.nodes.length;
+    generated.intent_graph = injectQualityAndSafetyNodes(generated.intent_graph, orchestration_card);
+    const injectedNodeCount = generated.intent_graph.nodes.length - originalNodeCount;
+    
+    if (injectedNodeCount > 0) {
+      console.error(`[generate] ✅ Injected ${injectedNodeCount} quality/safety nodes`);
+      // Add info to metadata
+      if (!generated.metadata) {
+        generated.metadata = { generation_timestamp: new Date().toISOString() };
+      }
+      (generated.metadata as any).quality_safety_injection = {
+        enabled: true,
+        nodes_injected: injectedNodeCount,
+        quality_enabled: orchestration_card.quality_requirements?.enabled || false,
+        safety_enabled: orchestration_card.safety_requirements?.enabled || false
+      };
+    }
 
     // Optionally validate
     if (options?.validate) {

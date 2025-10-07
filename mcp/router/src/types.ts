@@ -59,7 +59,7 @@ export interface NodeResult {
 
 export interface ExecutionResult {
   execution_id: string;
-  status: 'completed' | 'failed' | 'paused_for_approval' | 'cancelled';
+  status: 'completed' | 'failed' | 'failed_quality' | 'paused_for_approval' | 'cancelled';
   results: Record<string, NodeResult>;
   execution_time_ms: number;
   nodes_executed: number;
@@ -67,5 +67,17 @@ export interface ExecutionResult {
   context: Record<string, any>;
   paused_at_node?: string;
   waiting_for_approval?: boolean;
+  quality_validation?: {
+    quality_score: number;
+    is_acceptable: boolean;
+    issues: any[];
+    rerun_attempts: number;
+  };
+  safety_validation?: {
+    input_validated: boolean;
+    output_validated: boolean;
+    compliance_standards: string[];
+    audit_logged: boolean;
+  };
 }
 

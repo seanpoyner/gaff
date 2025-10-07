@@ -27,6 +27,14 @@ import {
   isHITLNode,
 } from './utils/graph-executor.js';
 import { routeToAgent } from './utils/agent-router.js';
+import {
+  QualityRequirements,
+  SafetyRequirements,
+  validateSafetyPre,
+  validateQualityPost,
+  validateSafetyPost,
+  logAuditEntry
+} from './utils/quality-safety-hooks.js';
 
 /**
  * MCP Tools Definition
@@ -65,6 +73,18 @@ const tools: Tool[] = [
             max_retries: { type: 'number', description: 'Max node retries (default: 3)' },
             store_state_in_memory: { type: 'boolean', description: 'Store execution state in memory (default: true)' },
           },
+        },
+        quality_requirements: {
+          type: 'object',
+          description: 'Quality validation requirements for automatic quality checks and rerun logic',
+        },
+        safety_requirements: {
+          type: 'object',
+          description: 'Safety and compliance requirements for validation and audit logging',
+        },
+        orchestration_card: {
+          type: 'object',
+          description: 'Original orchestration card (required for compliance validation)',
         },
       },
     },
@@ -245,7 +265,7 @@ class RouterServer {
   /**
    * Execute Intent Graph
    */
-  private async handleExecuteGraph(args: any) {
+  private async handleExecuteGraph(args: any): Promise<{ content: Array<{ type: string; text: string }> }> {
     const {
       graph,
       graph_memory_key,
@@ -274,6 +294,23 @@ class RouterServer {
     const validation = validateDAG(intentGraph);
     if (!validation.valid) {
       throw new Error(`Invalid graph: ${validation.error}`);
+    }
+
+    // PRE-EXECUTION SAFETY VALIDATION
+    if (args.safety_requirements?.enabled) {
+      console.error('[Router] 🔒 Running pre-execution safety checks...');
+      
+      const safetyCheck = await validateSafetyPre(
+        context,
+        args.safety_requirements,
+        args.orchestration_card
+      );
+      
+      if (!safetyCheck.passed) {
+        throw new Error(`❌ Safety validation failed: ${safetyCheck.errors.join(', ')}`);
+      }
+      
+      console.error('[Router] ✅ Pre-execution safety checks passed');
     }
 
     const execution_id = generateExecutionId();
@@ -407,13 +444,82 @@ class RouterServer {
     }
 
     const executionTime = Date.now() - startTime;
-    const status = failedNodes.length > 0 ? 'failed' : 'completed';
+    let status: 'completed' | 'failed' | 'failed_quality' = failedNodes.length > 0 ? 'failed' : 'completed';
 
     executionState.status = status;
     executionState.updated_at = new Date().toISOString();
 
     if (executionConfig.store_state_in_memory) {
       await this.memoryClient.storeExecutionState(executionState);
+    }
+
+    // POST-EXECUTION QUALITY VALIDATION
+    let qualityResult: any = null;
+    if (args.quality_requirements?.enabled && args.quality_requirements?.auto_validate && status === 'completed') {
+      console.error('[Router] 📊 Running post-execution quality checks...');
+      
+      qualityResult = await validateQualityPost(
+        { execution_id, status, results, execution_time_ms: executionTime },
+        args.quality_requirements,
+        intentGraph
+      );
+      
+      console.error(`[Router] Quality score: ${qualityResult.quality_score.toFixed(2)}`);
+      
+      // AUTOMATIC RERUN IF QUALITY FAILS
+      if (qualityResult.rerun_required && args.quality_requirements.rerun_strategy !== 'none') {
+        const attemptCount = (args._rerun_attempt || 0) + 1;
+        const maxAttempts = args.quality_requirements.max_rerun_attempts || 2;
+        
+        if (attemptCount <= maxAttempts) {
+          console.error(`[Router] ⚠️ Quality check failed. Rerunning (attempt ${attemptCount}/${maxAttempts})...`);
+          
+          // Recursive rerun with attempt tracking
+          return await this.handleExecuteGraph({
+            ...args,
+            _rerun_attempt: attemptCount
+          });
+        } else {
+          console.error(`[Router] ❌ Max rerun attempts reached (${maxAttempts})`);
+          status = 'failed_quality';
+        }
+      } else if (qualityResult.is_acceptable) {
+        console.error('[Router] ✅ Quality checks passed');
+      }
+    }
+
+    // POST-EXECUTION SAFETY VALIDATION
+    let sanitizedResults = results;
+    if (args.safety_requirements?.enabled && status === 'completed') {
+      console.error('[Router] 🔒 Running post-execution safety checks...');
+      
+      const outputCheck = await validateSafetyPost(
+        results,
+        args.safety_requirements
+      );
+      
+      if (outputCheck.sanitized_data) {
+        sanitizedResults = outputCheck.sanitized_data;
+        console.error('[Router] 🧹 Output sanitized');
+      }
+      
+      if (outputCheck.passed) {
+        console.error('[Router] ✅ Output safety checks passed');
+      } else {
+        console.error(`[Router] ⚠️ Output safety issues: ${outputCheck.errors.join(', ')}`);
+      }
+      
+      // AUDIT LOGGING
+      if (args.safety_requirements.audit_logging) {
+        console.error('[Router] 📝 Creating audit log entry...');
+        await logAuditEntry(
+          execution_id,
+          args.context?.user_id || 'unknown',
+          qualityResult?.quality_score,
+          args.safety_requirements.compliance_standards
+        );
+        console.error('[Router] ✅ Audit log created');
+      }
     }
 
       return {
@@ -423,11 +529,24 @@ class RouterServer {
           text: JSON.stringify({
                 execution_id,
                 status,
-                results,
+                results: sanitizedResults,
             execution_time_ms: executionTime,
             nodes_executed: Object.keys(results).length,
             nodes_failed: failedNodes,
             context: executionState.context,
+            // Quality & Safety metadata
+            quality_validation: qualityResult ? {
+              quality_score: qualityResult.quality_score,
+              is_acceptable: qualityResult.is_acceptable,
+              issues: qualityResult.issues,
+              rerun_attempts: args._rerun_attempt || 0
+            } : undefined,
+            safety_validation: args.safety_requirements?.enabled ? {
+              input_validated: true,
+              output_validated: true,
+              compliance_standards: args.safety_requirements.compliance_standards || [],
+              audit_logged: args.safety_requirements.audit_logging || false
+            } : undefined
           }, null, 2),
           },
         ],

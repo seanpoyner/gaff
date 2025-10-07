@@ -221,10 +221,35 @@ function formatResponse(result) {
   
   // Status box
   response += `## Status\n`;
-  response += `- **Result:** ${status === 'completed' ? '✅ Completed Successfully' : status === 'failed' ? '❌ Failed' : '⏳ ' + status}\n`;
+  response += `- **Result:** ${status === 'completed' ? '✅ Completed Successfully' : status === 'failed' ? '❌ Failed' : status === 'failed_quality' ? '⚠️ Failed Quality Check' : '⏳ ' + status}\n`;
   response += `- **Execution ID:** \`${executionId || 'N/A'}\`\n`;
   response += `- **Tasks:** ${successCount}/${tasks.length} completed\n`;
-  response += `- **Total Time:** ${(totalTime / 1000).toFixed(2)}s\n\n`;
+  response += `- **Total Time:** ${(totalTime / 1000).toFixed(2)}s\n`;
+  
+  // Quality validation info
+  if (result.execution_result?.quality_validation) {
+    const qv = result.execution_result.quality_validation;
+    response += `- **Quality Score:** ${qv.is_acceptable ? '✅' : '⚠️'} ${(qv.quality_score * 100).toFixed(1)}%`;
+    if (qv.rerun_attempts > 0) {
+      response += ` (${qv.rerun_attempts} rerun${qv.rerun_attempts > 1 ? 's' : ''})`;
+    }
+    response += `\n`;
+  }
+  
+  // Safety validation info
+  if (result.execution_result?.safety_validation) {
+    const sv = result.execution_result.safety_validation;
+    response += `- **Safety:** ${sv.input_validated && sv.output_validated ? '✅' : '⚠️'} Validated`;
+    if (sv.compliance_standards && sv.compliance_standards.length > 0) {
+      response += ` | ${sv.compliance_standards.join(', ')}`;
+    }
+    if (sv.audit_logged) {
+      response += ` | 📝 Audit Logged`;
+    }
+    response += `\n`;
+  }
+  
+  response += `\n`;
   
   // Only show agents if there are any
   if (agentsCount > 0) {

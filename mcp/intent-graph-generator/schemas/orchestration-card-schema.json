@@ -253,7 +253,158 @@
     "special_requirements": {
       "type": "array",
       "items": { "type": "string" },
-      "description": "Domain-specific requirements (compliance, security, etc.)"
+      "description": "Domain-specific requirements (compliance, security, etc.) - DEPRECATED: Use quality_requirements and safety_requirements instead"
+    },
+    "quality_requirements": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic quality validation"
+        },
+        "required_fields": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Fields that must be present in execution result"
+        },
+        "accuracy_threshold": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.85,
+          "description": "Minimum quality score (0-1) required for acceptance"
+        },
+        "completeness_required": {
+          "type": "boolean",
+          "default": true,
+          "description": "All required fields must be present"
+        },
+        "performance_sla_ms": {
+          "type": "integer",
+          "description": "Maximum acceptable execution time in milliseconds"
+        },
+        "auto_validate": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically validate results after execution"
+        },
+        "rerun_strategy": {
+          "type": "string",
+          "enum": ["none", "partial", "full", "adaptive"],
+          "default": "adaptive",
+          "description": "Strategy for rerunning failed workflows"
+        },
+        "max_rerun_attempts": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 5,
+          "default": 2,
+          "description": "Maximum number of rerun attempts"
+        },
+        "scoring_weights": {
+          "type": "object",
+          "properties": {
+            "completeness_weight": { "type": "number", "default": 0.4 },
+            "accuracy_weight": { "type": "number", "default": 0.4 },
+            "performance_weight": { "type": "number", "default": 0.2 }
+          },
+          "description": "Custom weights for quality scoring components"
+        }
+      }
+    },
+    "safety_requirements": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable automatic safety validation"
+        },
+        "compliance_standards": {
+          "type": "array",
+          "items": { 
+            "type": "string",
+            "enum": ["GDPR", "CCPA", "PCI-DSS", "SOC2", "HIPAA", "ISO27001"]
+          },
+          "description": "Compliance standards to enforce"
+        },
+        "guardrails": {
+          "type": "object",
+          "properties": {
+            "pii_detection": {
+              "type": "boolean",
+              "default": true,
+              "description": "Detect and mask personally identifiable information"
+            },
+            "content_filtering": {
+              "type": "boolean",
+              "default": false,
+              "description": "Filter unsafe or inappropriate content"
+            },
+            "rate_limiting": {
+              "type": "boolean",
+              "default": false,
+              "description": "Enforce rate limits on API calls"
+            }
+          }
+        },
+        "input_validation": {
+          "type": "object",
+          "properties": {
+            "max_size_bytes": {
+              "type": "integer",
+              "default": 1000000,
+              "description": "Maximum input size in bytes"
+            },
+            "allowed_formats": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Allowed input formats (e.g., json, xml, csv)"
+            },
+            "required_fields": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Required input fields"
+            },
+            "sanitize_input": {
+              "type": "boolean",
+              "default": true,
+              "description": "Automatically sanitize input data"
+            }
+          }
+        },
+        "output_validation": {
+          "type": "object",
+          "properties": {
+            "mask_pii": {
+              "type": "boolean",
+              "default": true,
+              "description": "Automatically mask PII in output"
+            },
+            "sanitize_output": {
+              "type": "boolean",
+              "default": true,
+              "description": "Sanitize output before returning"
+            },
+            "required_fields": {
+              "type": "array",
+              "items": { "type": "string" },
+              "description": "Required output fields"
+            }
+          }
+        },
+        "audit_logging": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically log execution for compliance audit trails"
+        },
+        "encryption_required": {
+          "type": "boolean",
+          "default": false,
+          "description": "Require encryption for sensitive data"
+        }
+      }
     },
     "example_scenarios": {
       "type": "array",

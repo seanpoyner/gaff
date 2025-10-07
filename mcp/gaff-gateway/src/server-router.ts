@@ -69,43 +69,43 @@ export class ServerRouter {
         toolPrefix: 'graph_'
       },
       
-      // Agent Orchestration (local GAFF server)
+      // Agent Orchestration (published GAFF server)
       {
         name: 'agent-orchestration',
-        command: 'node',
-        args: [resolve(gaffRoot, 'agent-orchestration/build/index.js')],
+        command: 'npx',
+        args: ['-y', 'agent-orchestration-mcp-server'],
         toolPrefix: 'orchestration_'
       },
       
-      // Router (local GAFF server)
+      // Router (published GAFF server)
       {
         name: 'router',
-        command: 'node',
-        args: [resolve(gaffRoot, 'router/build/index.js')],
+        command: 'npx',
+        args: ['-y', 'router-mcp-server'],
         toolPrefix: 'router_'
       },
       
-      // Quality Check (local GAFF server)
+      // Quality Check (published GAFF server)
       {
         name: 'quality-check',
-        command: 'node',
-        args: [resolve(gaffRoot, 'quality-check/build/index.js')],
+        command: 'npx',
+        args: ['-y', 'quality-check-mcp-server'],
         toolPrefix: 'quality_'
       },
       
-      // Safety Protocols (local GAFF server)
+      // Safety Protocols (published GAFF server)
       {
         name: 'safety-protocols',
-        command: 'node',
-        args: [resolve(gaffRoot, 'safety-protocols/build/index.js')],
+        command: 'npx',
+        args: ['-y', 'safety-protocols-mcp-server'],
         toolPrefix: 'safety_'
       },
       
-      // Tools (local GAFF server)
+      // Tools (published GAFF server)
       {
         name: 'tools',
-        command: 'node',
-        args: [resolve(gaffRoot, 'tools/build/index.js')],
+        command: 'npx',
+        args: ['-y', 'gaff-tools-mcp-server'],
         toolPrefix: 'tools_'
       },
     ];

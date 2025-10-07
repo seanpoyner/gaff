@@ -17,6 +17,7 @@ console.log(`
    ✓ router-mcp-server
    ✓ quality-check-mcp-server
    ✓ safety-protocols-mcp-server
+   ✓ gaff-tools-mcp-server
 
 🚀 Quick Start:
    1. Start the GAFF Gateway:

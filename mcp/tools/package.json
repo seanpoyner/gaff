@@ -48,6 +48,11 @@
   "bugs": {
     "url": "https://github.com/seanpoyner/gaff/issues"
   },
-  "homepage": "https://github.com/seanpoyner/gaff#readme"
+  "homepage": "https://github.com/seanpoyner/gaff#readme",
+  "files": [
+    "build/",
+    "README.md",
+    "LICENSE"
+  ]
 }
 

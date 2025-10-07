@@ -2,6 +2,7 @@
 *
 
 # Include only what's needed
+!cli.js
 !postinstall.js
 !README.md
 !LICENSE

@@ -19,15 +19,23 @@ console.log(`
    ✓ safety-protocols-mcp-server
 
 🚀 Quick Start:
-   1. Run individual servers:
-      npx gaff-gateway
-      npx agent-orchestration-mcp-server
+   1. Start the GAFF Gateway:
+      gaff start
+      (or just: gaff)
       
-   2. View documentation:
-      https://github.com/seanpoyner/gaff
+   2. Use as MCP server in Claude/Cursor:
+      Add to mcp.json:
+      {
+        "gaff": {
+          "command": "npx",
+          "args": ["-y", "@seanpoyner/gaff"]
+        }
+      }
 
-   3. Configure in Claude/Cursor:
-      Add servers to your MCP configuration file
+   3. CLI Commands:
+      gaff list     - List all servers
+      gaff version  - Show version
+      gaff help     - Show help
 
 📚 Documentation: https://github.com/seanpoyner/gaff#readme
 🐛 Issues: https://github.com/seanpoyner/gaff/issues

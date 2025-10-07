@@ -267,9 +267,110 @@ class GaffGateway {
           properties: {
             execution_result: { type: "object", description: "Result to validate" },
             quality_criteria: { type: "object", description: "Quality thresholds and requirements" },
-            intent_graph: { type: "object", description: "Original intent graph for context" }
+            intent_graph: { type: "object", description: "Original intent graph for context" },
+            original_request: { type: "object", description: "Original user request" }
+          },
+          required: ["execution_result", "quality_criteria"]
+        }
+      },
+      
+      {
+        name: "quality_score_quality",
+        description: "[QUALITY] Calculate quality score for execution results with weighted component scores",
+        inputSchema: {
+          type: "object",
+          properties: {
+            execution_result: { type: "object", description: "Execution result to score" },
+            scoring_criteria: { 
+              type: "object", 
+              properties: {
+                completeness_weight: { type: "number" },
+                accuracy_weight: { type: "number" },
+                performance_weight: { type: "number" }
+              },
+              description: "Weights for scoring components" 
+            }
           },
           required: ["execution_result"]
+        }
+      },
+      
+      {
+        name: "quality_check_completeness",
+        description: "[QUALITY] Verify all required outputs are present and properly formatted",
+        inputSchema: {
+          type: "object",
+          properties: {
+            execution_result: { type: "object", description: "Result to check" },
+            required_outputs: { 
+              type: "object",
+              properties: {
+                required_fields: { type: "array", items: { type: "string" } },
+                required_types: { type: "object" },
+                required_formats: { type: "object" }
+              },
+              description: "Output requirements" 
+            }
+          },
+          required: ["execution_result", "required_outputs"]
+        }
+      },
+      
+      {
+        name: "quality_check_accuracy",
+        description: "[QUALITY] Validate accuracy and correctness of results against rules",
+        inputSchema: {
+          type: "object",
+          properties: {
+            execution_result: { type: "object", description: "Result to validate" },
+            accuracy_criteria: { 
+              type: "object",
+              properties: {
+                validation_rules: { type: "array" },
+                business_rules: { type: "array" },
+                expected_ranges: { type: "object" }
+              },
+              description: "Accuracy validation criteria" 
+            },
+            reference_data: { type: "object", description: "Optional reference for comparison" }
+          },
+          required: ["execution_result", "accuracy_criteria"]
+        }
+      },
+      
+      {
+        name: "quality_determine_rerun_strategy",
+        description: "[QUALITY] Intelligently decide the best rerun strategy based on failure analysis",
+        inputSchema: {
+          type: "object",
+          properties: {
+            execution_result: { type: "object", description: "Execution result" },
+            validation_result: { type: "object", description: "Result from validate_execution_result" },
+            intent_graph: { type: "object", description: "Original intent graph" },
+            failure_history: { type: "array", description: "Previous failures in this execution" }
+          },
+          required: ["execution_result", "validation_result", "intent_graph"]
+        }
+      },
+      
+      {
+        name: "quality_analyze_failure_patterns",
+        description: "[QUALITY] Identify patterns in failures to help improve workflows",
+        inputSchema: {
+          type: "object",
+          properties: {
+            execution_history: { type: "array", description: "History of executions" },
+            intent_graph: { type: "object", description: "Intent graph to analyze" },
+            time_range: { 
+              type: "object",
+              properties: {
+                start: { type: "string" },
+                end: { type: "string" }
+              },
+              description: "Time range for analysis" 
+            }
+          },
+          required: ["execution_history", "intent_graph"]
         }
       },
       

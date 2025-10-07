@@ -171,7 +171,14 @@ export class ServerRouter {
       'validate_input': 'validate_input',
       'validate_output': 'validate_output',
       'enforce_rate_limits': 'enforce_rate_limits',
-      'audit_log': 'audit_log'
+      'audit_log': 'audit_log',
+      // Quality tools - map from gateway names to server names
+      'validate_result': 'validate_execution_result',
+      'score_quality': 'score_quality',
+      'check_completeness': 'check_completeness',
+      'check_accuracy': 'check_accuracy',
+      'determine_rerun_strategy': 'determine_rerun_strategy',
+      'analyze_failure_patterns': 'analyze_failure_patterns'
     };
     
     if (toolMappings[toolBaseName]) {

@@ -209,7 +209,7 @@ class GaffGateway {
       },
       
       {
-        name: "graph_visualize",
+        name: "graph_visualize_graph",
         description: "[GRAPH] Generate Mermaid diagram visualization of an intent graph",
         inputSchema: {
           type: "object",

@@ -38,12 +38,11 @@ function startGateway(args) {
   console.error('Starting GAFF Gateway...');
   
   try {
-    // Try to find gaff-gateway in node_modules
-    const gatewayPath = resolve(__dirname, 'node_modules', 'gaff-gateway', 'build', 'index.js');
-    
-    const gateway = spawn('node', [gatewayPath, ...args], {
+    // Use npx to run gaff-gateway - this ensures it finds the correct installed version
+    const gateway = spawn('npx', ['-y', 'gaff-gateway', ...args], {
       stdio: 'inherit',
       env: process.env,
+      shell: true, // Required for Windows to find npx.cmd
     });
 
     gateway.on('error', (err) => {

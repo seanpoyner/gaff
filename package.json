@@ -1,6 +1,6 @@
 {
   "name": "@seanpoyner/gaff",
-  "version": "1.3.6",
+  "version": "1.3.7",
   "description": "GAFF - Graphical Agentic Flow Framework: Complete MCP server suite for AI agent orchestration (meta-package)",
   "type": "module",
   "bin": {

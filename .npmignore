@@ -1,0 +1,8 @@
+# Exclude everything except what's in "files" in package.json
+*
+
+# Include only what's needed
+!postinstall.js
+!README.md
+!LICENSE
+

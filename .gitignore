@@ -55,3 +55,6 @@ temp/
 *.pid
 server.pid
 
+# npm package lock for meta-package
+package-lock.json
+

@@ -1,0 +1,51 @@
+{
+  "name": "@seanpoyner/gaff",
+  "version": "1.0.0",
+  "description": "GAFF - Graphical Agentic Flow Framework: Complete MCP server suite for AI agent orchestration (meta-package)",
+  "type": "module",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "ai-agents",
+    "orchestration",
+    "workflow",
+    "gaff",
+    "agent-orchestration",
+    "intent-graph",
+    "router",
+    "quality-check",
+    "safety-protocols"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanpoyner/gaff.git"
+  },
+  "bugs": {
+    "url": "https://github.com/seanpoyner/gaff/issues"
+  },
+  "homepage": "https://github.com/seanpoyner/gaff#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "scripts": {
+    "postinstall": "node postinstall.js"
+  },
+  "files": [
+    "postinstall.js",
+    "README.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "gaff-gateway": "^1.0.0",
+    "agent-orchestration-mcp-server": "^1.0.1",
+    "intent-graph-mcp-server": "^2.2.4",
+    "router-mcp-server": "^1.0.1",
+    "quality-check-mcp-server": "^1.0.0",
+    "safety-protocols-mcp-server": "^1.0.0",
+    "@modelcontextprotocol/server-memory": "^0.6.2"
+  }
+}
+

@@ -1,6 +1,6 @@
 {
   "name": "router-mcp-server",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Execution engine for GAFF workflows - executes intent graphs with memory-backed state management, parallel execution, and HITL support",
   "type": "module",
   "main": "build/index.js",
@@ -62,4 +62,3 @@
     "LICENSE"
   ]
 }
-

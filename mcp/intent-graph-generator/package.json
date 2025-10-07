@@ -1,6 +1,6 @@
 {
   "name": "intent-graph-mcp-server",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Universal LLM-powered MCP server for automated Intent Graph generation (Writer Palmyra, Claude, OpenAI, custom)",
   "type": "module",
   "main": "build/index.js",

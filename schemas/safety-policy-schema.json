@@ -1,0 +1,124 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SafetyPolicy",
+  "description": "Safety and compliance policy configuration",
+  "type": "object",
+  "properties": {
+    "enabled": {
+      "type": "boolean",
+      "description": "Whether safety protocols are enabled",
+      "default": true
+    },
+    "guardrails": {
+      "type": "object",
+      "properties": {
+        "input_validation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "max_input_size_mb": { "type": "number" },
+            "allowed_content_types": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "block_suspicious_patterns": { "type": "boolean" }
+          }
+        },
+        "output_validation": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "pii_detection": { "type": "boolean" },
+            "content_filtering": { "type": "boolean" },
+            "schema_enforcement": { "type": "boolean" }
+          }
+        },
+        "execution_limits": {
+          "type": "object",
+          "properties": {
+            "max_nodes_per_graph": { "type": "integer" },
+            "max_execution_time_ms": { "type": "integer" },
+            "max_memory_mb": { "type": "integer" },
+            "max_api_calls_per_execution": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "compliance_checks": {
+      "type": "object",
+      "properties": {
+        "data_privacy": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "regulations": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "enum": ["GDPR", "CCPA", "HIPAA", "SOC2", "ISO27001"]
+              }
+            },
+            "pii_handling": {
+              "type": "string",
+              "enum": ["mask", "encrypt", "remove", "log"]
+            },
+            "data_retention_days": { "type": "integer" }
+          }
+        },
+        "security": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "encryption_required": { "type": "boolean" },
+            "authentication_required": { "type": "boolean" },
+            "audit_logging": { "type": "boolean" }
+          }
+        },
+        "rate_limiting": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "per_user": { "type": "integer" },
+            "per_ip": { "type": "integer" },
+            "per_endpoint": { "type": "integer" }
+          }
+        }
+      }
+    },
+    "policy_enforcement": {
+      "type": "object",
+      "properties": {
+        "block_on_violation": { "type": "boolean" },
+        "log_violations": { "type": "boolean" },
+        "notify_on_violation": { "type": "boolean" },
+        "violation_cooldown_minutes": { "type": "integer" }
+      }
+    },
+    "allowed_operations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Whitelist of allowed operations"
+    },
+    "blocked_operations": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Blacklist of blocked operations"
+    },
+    "custom_rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "description": { "type": "string" },
+          "rule": { "type": "string" },
+          "action": {
+            "type": "string",
+            "enum": ["block", "warn", "log", "modify"]
+          }
+        }
+      }
+    }
+  }
+}
+

@@ -1,0 +1,94 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "GaffConfig",
+  "description": "GAFF framework configuration schema",
+  "type": "object",
+  "required": ["version", "primary_agent", "agents", "models", "protocols"],
+  "properties": {
+    "version": {
+      "type": "string",
+      "description": "GAFF configuration version"
+    },
+    "name": {
+      "type": "string",
+      "description": "Configuration name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Configuration description"
+    },
+    "primary_agent": {
+      "type": "object",
+      "required": ["name", "type", "mcp_servers"],
+      "properties": {
+        "name": { "type": "string" },
+        "type": { "type": "string", "enum": ["copilot_studio", "custom"] },
+        "description": { "type": "string" },
+        "mcp_servers": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "memory_enabled": { "type": "boolean" },
+        "conversation_context_window": { "type": "integer", "minimum": 1 }
+      }
+    },
+    "agents": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["type", "description", "capabilities"],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": ["validator", "api", "llm", "transformer", "router", "aggregator", "custom"]
+          },
+          "description": { "type": "string" },
+          "capabilities": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "endpoint": { "type": "string" },
+          "model": { "type": "string" },
+          "authentication": {
+            "type": "string",
+            "enum": ["azure_ad", "api_key", "oauth", "none"]
+          },
+          "timeout_ms": { "type": "integer", "minimum": 0 },
+          "retry_policy": { "type": "object" },
+          "input_schema": { "type": "object" },
+          "output_schema": { "type": "object" }
+        }
+      }
+    },
+    "models": {
+      "type": "object",
+      "properties": {
+        "primary_llm": { "type": "object" },
+        "fallback_llm": { "type": "object" },
+        "fast_llm": { "type": "object" }
+      }
+    },
+    "protocols": {
+      "type": "object",
+      "required": ["mcp_version", "transport"],
+      "properties": {
+        "mcp_version": { "type": "string" },
+        "transport": { "type": "string", "enum": ["stdio", "http", "websocket"] },
+        "http_fallback": { "type": "boolean" },
+        "http_port": { "type": "integer" },
+        "memory_mcp": { "type": "object" }
+      }
+    },
+    "schemas": {
+      "type": "object",
+      "description": "Paths to JSON schema files"
+    },
+    "context": { "type": "object" },
+    "constraints": { "type": "object" },
+    "quality_assurance": { "type": "object" },
+    "safety_protocols": { "type": "object" },
+    "instructions": { "type": "object" },
+    "metadata": { "type": "object" }
+  }
+}
+

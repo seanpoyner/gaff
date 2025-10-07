@@ -1,0 +1,65 @@
+{
+  "name": "router-mcp-server",
+  "version": "1.0.0",
+  "description": "Execution engine for GAFF workflows - executes intent graphs with memory-backed state management, parallel execution, and HITL support",
+  "type": "module",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "bin": {
+    "router-mcp-server": "build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc && node build/index.js",
+    "watch": "tsc --watch",
+    "test": "node test-execution.js",
+    "prepare": "npm run build"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "router",
+    "execution-engine",
+    "workflow-execution",
+    "agent-routing",
+    "gaff",
+    "workflow",
+    "orchestration",
+    "dag",
+    "parallel-execution",
+    "state-management",
+    "human-in-the-loop",
+    "hitl",
+    "intent-graph",
+    "ai-agents"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanpoyner/gaff.git",
+    "directory": "mcp/router"
+  },
+  "bugs": {
+    "url": "https://github.com/seanpoyner/gaff/issues"
+  },
+  "homepage": "https://github.com/seanpoyner/gaff/tree/main/mcp/router#readme",
+  "files": [
+    "build/",
+    "README.md",
+    "LICENSE"
+  ]
+}
+

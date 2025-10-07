@@ -1,0 +1,180 @@
+{
+  "version": "1.0.0",
+  "name": "Sample GAFF Configuration",
+  "description": "Example configuration for testing agent-orchestration MCP server",
+  "agents": {
+    "DataValidator": {
+      "type": "validator",
+      "description": "Validates data against schemas and business rules",
+      "capabilities": [
+        "data-validation",
+        "schema-validation",
+        "business-rules"
+      ],
+      "endpoint": "https://api.example.com/validate",
+      "authentication": "api_key",
+      "input_schema": {
+        "data": {
+          "type": "object",
+          "description": "Data to validate"
+        },
+        "schema": {
+          "type": "object",
+          "description": "JSON schema to validate against"
+        }
+      },
+      "output_schema": {
+        "valid": {
+          "type": "boolean",
+          "description": "Whether the data is valid"
+        },
+        "errors": {
+          "type": "array",
+          "description": "Validation errors if any"
+        }
+      },
+      "timeout_ms": 30000,
+      "retry_policy": {
+        "max_attempts": 3,
+        "backoff_strategy": "exponential"
+      }
+    },
+    "DataProcessor": {
+      "type": "api",
+      "description": "Processes and transforms data",
+      "capabilities": [
+        "data-processing",
+        "transformation",
+        "enrichment"
+      ],
+      "endpoint": "https://api.example.com/process",
+      "authentication": "api_key",
+      "input_schema": {
+        "data": {
+          "type": "object",
+          "description": "Data to process"
+        },
+        "operations": {
+          "type": "array",
+          "description": "List of transformations to apply"
+        }
+      },
+      "output_schema": {
+        "processed_data": {
+          "type": "object",
+          "description": "Processed data"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["success", "partial", "failure"]
+        }
+      },
+      "timeout_ms": 60000
+    },
+    "NotificationService": {
+      "type": "api",
+      "description": "Sends notifications via email, SMS, or push",
+      "capabilities": [
+        "email",
+        "sms",
+        "push-notifications",
+        "messaging"
+      ],
+      "endpoint": "https://api.example.com/notify",
+      "authentication": "oauth",
+      "input_schema": {
+        "recipients": {
+          "type": "array",
+          "description": "List of recipients"
+        },
+        "message": {
+          "type": "string",
+          "description": "Message content"
+        },
+        "channel": {
+          "type": "string",
+          "enum": ["email", "sms", "push"]
+        }
+      },
+      "output_schema": {
+        "sent": {
+          "type": "boolean",
+          "description": "Whether notifications were sent"
+        },
+        "message_ids": {
+          "type": "array",
+          "description": "IDs of sent messages"
+        }
+      },
+      "timeout_ms": 15000
+    },
+    "DatabaseWriter": {
+      "type": "api",
+      "description": "Writes data to database",
+      "capabilities": [
+        "database-write",
+        "data-storage",
+        "persistence"
+      ],
+      "endpoint": "https://api.example.com/db/write",
+      "authentication": "api_key",
+      "input_schema": {
+        "table": {
+          "type": "string",
+          "description": "Database table name"
+        },
+        "data": {
+          "type": "object",
+          "description": "Data to write"
+        },
+        "operation": {
+          "type": "string",
+          "enum": ["insert", "update", "upsert"]
+        }
+      },
+      "output_schema": {
+        "success": {
+          "type": "boolean",
+          "description": "Whether write was successful"
+        },
+        "record_id": {
+          "type": "string",
+          "description": "ID of the written record"
+        }
+      },
+      "timeout_ms": 30000
+    },
+    "SentimentAnalyzer": {
+      "type": "llm",
+      "description": "Analyzes sentiment of text using LLM",
+      "capabilities": [
+        "sentiment-analysis",
+        "text-analysis",
+        "emotion-detection"
+      ],
+      "model": "palmyra-x-004",
+      "temperature": 0.3,
+      "input_schema": {
+        "text": {
+          "type": "string",
+          "description": "Text to analyze"
+        }
+      },
+      "output_schema": {
+        "sentiment": {
+          "type": "string",
+          "enum": ["positive", "negative", "neutral"]
+        },
+        "confidence": {
+          "type": "number",
+          "description": "Confidence score 0-1"
+        },
+        "emotions": {
+          "type": "array",
+          "description": "Detected emotions"
+        }
+      }
+    }
+  }
+}
+

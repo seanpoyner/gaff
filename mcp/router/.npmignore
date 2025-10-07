@@ -1,0 +1,30 @@
+# Source files (we publish built files)
+src/
+tsconfig.json
+
+# Tests and examples
+test-*.js
+examples/
+
+# Documentation (keep README.md, remove others)
+QUICKSTART.md
+
+# Development files
+node_modules/
+.git/
+.gitignore
+*.log
+*.tgz
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+

@@ -1,0 +1,57 @@
+{
+  "graph_id": "example_001",
+  "version": "1.0",
+  "nodes": [
+    {
+      "id": "node_1",
+      "agent": "data-agent",
+      "tool": "fetch_data",
+      "input": {
+        "source": "database",
+        "query": "SELECT * FROM users LIMIT 10"
+      },
+      "dependencies": []
+    },
+    {
+      "id": "node_2",
+      "agent": "transform-agent",
+      "tool": "transform_data",
+      "input": {
+        "data": "${node_1.result.data}",
+        "transformation": "normalize"
+      },
+      "dependencies": ["node_1"]
+    },
+    {
+      "id": "node_3",
+      "agent": "analysis-agent",
+      "tool": "analyze_data",
+      "input": {
+        "data": "${node_2.result.normalized_data}",
+        "metrics": ["mean", "median", "std_dev"]
+      },
+      "dependencies": ["node_2"]
+    }
+  ],
+  "edges": [
+    {
+      "from": "node_1",
+      "to": "node_2",
+      "data_flow": {
+        "result.data": "data"
+      }
+    },
+    {
+      "from": "node_2",
+      "to": "node_3",
+      "data_flow": {
+        "result.normalized_data": "data"
+      }
+    }
+  ],
+  "metadata": {
+    "description": "Simple 3-node sequential workflow",
+    "author": "test"
+  }
+}
+

@@ -1,0 +1,38 @@
+{
+  "name": "gaff-memory-server",
+  "version": "1.0.0",
+  "description": "Official MCP memory server bundled with GAFF for out-of-the-box memory support",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "gaff-memory": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "memory",
+    "knowledge-graph",
+    "gaff"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server-memory": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanpoyner/gaff.git",
+    "directory": "mcp/memory"
+  },
+  "bugs": {
+    "url": "https://github.com/seanpoyner/gaff/issues"
+  },
+  "homepage": "https://github.com/seanpoyner/gaff#readme"
+}

@@ -1,0 +1,60 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build output
+build/
+dist/
+*.js
+*.js.map
+*.d.ts
+*.d.ts.map
+
+# Keep source TypeScript
+!src/**/*.ts
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+logs/
+
+# Editor directories and files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS files
+Thumbs.db
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Python (if any test scripts)
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Keep important files
+!package.json
+!tsconfig.json
+!README.md
+!.gitignore
+

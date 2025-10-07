@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  # GAFF OpenAI Adapter
+  gaff-adapter:
+    build: .
+    container_name: gaff-adapter
+    ports:
+      - "3100:3100"
+    environment:
+      - PORT=3100
+      - GAFF_GATEWAY_PATH=/gaff/mcp/gaff-gateway/build/index.js
+    volumes:
+      - ..:/gaff
+    restart: unless-stopped
+    networks:
+      - gaff-network
+
+  # Open WebUI
+  open-webui:
+    image: ghcr.io/open-webui/open-webui:main
+    container_name: open-webui
+    ports:
+      - "8080:8080"
+    environment:
+      - OPENAI_API_BASE_URL=http://gaff-adapter:3100/v1
+      - OPENAI_API_KEY=dummy-key-not-used
+      - WEBUI_NAME=GAFF Assistant
+      - WEBUI_DESCRIPTION=AI Orchestration Framework
+    volumes:
+      - open-webui-data:/app/backend/data
+    depends_on:
+      - gaff-adapter
+    restart: unless-stopped
+    networks:
+      - gaff-network
+
+networks:
+  gaff-network:
+    driver: bridge
+
+volumes:
+  open-webui-data:
+

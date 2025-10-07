@@ -1,0 +1,50 @@
+{
+  "name": "quality-check-mcp-server",
+  "version": "1.0.0",
+  "description": "MCP server for quality validation, scoring, and rerun strategy determination in GAFF",
+  "type": "module",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "bin": {
+    "quality-check-mcp-server": "build/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "dev": "tsc && node build/index.js",
+    "watch": "tsc --watch",
+    "test": "echo \"Tests coming soon\" && exit 0"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "quality-assurance",
+    "validation",
+    "quality-scoring",
+    "rerun-strategy",
+    "gaff"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanpoyner/gaff.git",
+    "directory": "mcp/quality-check"
+  },
+  "bugs": {
+    "url": "https://github.com/seanpoyner/gaff/issues"
+  },
+  "homepage": "https://github.com/seanpoyner/gaff#readme"
+}
+

@@ -1,0 +1,39 @@
+{
+  "name": "gaff-sequential-thinking",
+  "version": "1.0.0",
+  "description": "Sequential thinking MCP server bundled with GAFF for step-by-step reasoning",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "gaff-thinking": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "reasoning",
+    "thinking",
+    "step-by-step",
+    "gaff"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server-sequential-thinking": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanpoyner/gaff.git",
+    "directory": "mcp/sequential-thinking"
+  },
+  "bugs": {
+    "url": "https://github.com/seanpoyner/gaff/issues"
+  },
+  "homepage": "https://github.com/seanpoyner/gaff#readme"
+}

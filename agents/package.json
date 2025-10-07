@@ -1,0 +1,33 @@
+{
+  "name": "gaff-agents",
+  "version": "1.0.0",
+  "description": "Internal GAFF agents that use GAFF's MCP servers",
+  "type": "module",
+  "main": "gaff-agent-base.js",
+  "scripts": {
+    "build": "tsc",
+    "example:analyzer": "npm run build && node examples/data-analyzer-agent.js",
+    "example:orchestrator": "npm run build && node examples/workflow-orchestrator-agent.js",
+    "example:workflow": "npm run build && node build/examples/workflow-demo-agent.js",
+    "example:chatbot": "npm run build && node build/examples/simple-chatbot-agent.js"
+  },
+  "keywords": [
+    "gaff",
+    "agents",
+    "mcp-client",
+    "orchestration"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "devDependencies": {
+    "@types/node": "^22.18.8",
+    "typescript": "^5.9.3"
+  }
+}
+

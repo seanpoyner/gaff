@@ -1,0 +1,50 @@
+# Source files (users get compiled JS)
+src/
+tsconfig.json
+*.ts
+!*.d.ts
+
+# Tests
+test.js
+test.d.ts
+test-utils.js
+test-utils.d.ts
+TEST_SUMMARY.md
+TESTING.md
+
+# Development files
+.vscode/
+.cursor/
+*.log
+*.tgz
+.DS_Store
+
+# Documentation that's not needed in package
+IMPLEMENTATION_SUMMARY.md
+V2_IMPLEMENTATION_SUMMARY.md
+CONFLUENCE_DOCUMENTATION.md
+CONFLUENCE_UPLOAD_INSTRUCTIONS.md
+cursor-config.json
+CURSOR_SETUP.md
+
+# Examples and schema (keep these - useful for users)
+# intent_graph_examples.md
+# intent_graph_schema_v1.json
+
+# Git files
+.git/
+.gitignore
+.gitattributes
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Environment
+.env
+.env.*
+node_modules/
+
+# Build artifacts we don't need
+*.map
+build/**/*.map

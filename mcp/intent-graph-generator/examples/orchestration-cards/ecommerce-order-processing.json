@@ -1,0 +1,297 @@
+{
+  "user_request": {
+    "description": "Process customer orders with validation, inventory check, payment processing, and customer notification",
+    "domain": "e-commerce",
+    "success_criteria": [
+      "Order data is validated",
+      "Inventory is checked and reserved",
+      "Payment is processed successfully",
+      "Customer receives confirmation"
+    ],
+    "input_data": {
+      "order": {
+        "order_id": "string",
+        "customer_id": "string",
+        "items": "array",
+        "total_amount": "number",
+        "payment_method": "object"
+      }
+    },
+    "expected_output": {
+      "order_id": "string",
+      "status": "string",
+      "transaction_id": "string",
+      "confirmation_sent": "boolean"
+    }
+  },
+  
+  "available_agents": [
+    {
+      "name": "OrderValidator",
+      "type": "validator",
+      "capabilities": ["validate_schema", "check_required_fields", "sanitize_input"],
+      "description": "Validates order data against business rules and schema",
+      "input_schema": {
+        "order": { "type": "object" }
+      },
+      "output_schema": {
+        "is_valid": { "type": "boolean" },
+        "errors": { "type": "array" },
+        "validated_order": { "type": "object" }
+      },
+      "estimated_latency_ms": 500,
+      "cost_per_call": 0.001,
+      "reliability_score": 0.99
+    },
+    {
+      "name": "InventoryChecker",
+      "type": "api",
+      "capabilities": ["check_stock", "reserve_items", "release_reservation"],
+      "description": "Checks inventory availability and reserves items",
+      "input_schema": {
+        "items": { "type": "array" },
+        "warehouse_id": { "type": "string", "optional": true }
+      },
+      "output_schema": {
+        "in_stock": { "type": "boolean" },
+        "reserved": { "type": "boolean" },
+        "reservation_id": { "type": "string" },
+        "availability": { "type": "object" }
+      },
+      "estimated_latency_ms": 2000,
+      "cost_per_call": 0.005,
+      "reliability_score": 0.95
+    },
+    {
+      "name": "FraudDetector",
+      "type": "llm",
+      "capabilities": ["analyze_order_patterns", "risk_scoring", "anomaly_detection"],
+      "description": "AI-powered fraud detection",
+      "input_schema": {
+        "order": { "type": "object" },
+        "customer_history": { "type": "object" }
+      },
+      "output_schema": {
+        "risk_score": { "type": "number" },
+        "is_suspicious": { "type": "boolean" },
+        "reasons": { "type": "array" }
+      },
+      "estimated_latency_ms": 3000,
+      "cost_per_call": 0.02,
+      "reliability_score": 0.92
+    },
+    {
+      "name": "PaymentProcessor",
+      "type": "api",
+      "capabilities": ["process_payment", "refund", "authorize", "capture"],
+      "description": "Processes payment transactions",
+      "input_schema": {
+        "amount": { "type": "number" },
+        "payment_method": { "type": "object" },
+        "customer_id": { "type": "string" }
+      },
+      "output_schema": {
+        "transaction_id": { "type": "string" },
+        "status": { "type": "string" },
+        "timestamp": { "type": "string" },
+        "authorization_code": { "type": "string" }
+      },
+      "estimated_latency_ms": 5000,
+      "cost_per_call": 0.01,
+      "reliability_score": 0.98
+    },
+    {
+      "name": "NotificationService",
+      "type": "tool",
+      "capabilities": ["send_email", "send_sms", "send_push"],
+      "description": "Sends customer notifications",
+      "input_schema": {
+        "customer_id": { "type": "string" },
+        "template": { "type": "string" },
+        "data": { "type": "object" }
+      },
+      "output_schema": {
+        "sent": { "type": "boolean" },
+        "message_id": { "type": "string" },
+        "channel": { "type": "string" }
+      },
+      "estimated_latency_ms": 1000,
+      "cost_per_call": 0.002,
+      "reliability_score": 0.97
+    }
+  ],
+  
+  "available_mcp_servers": [
+    {
+      "name": "database-mcp",
+      "url": "mcp://localhost:3001",
+      "tools": [
+        {
+          "name": "query_customer_history",
+          "description": "Query customer purchase history",
+          "input_schema": {
+            "customer_id": { "type": "string" }
+          },
+          "output_schema": {
+            "orders": { "type": "array" },
+            "total_spent": { "type": "number" },
+            "risk_factors": { "type": "array" }
+          }
+        },
+        {
+          "name": "update_order_status",
+          "description": "Update order status in database",
+          "input_schema": {
+            "order_id": { "type": "string" },
+            "status": { "type": "string" }
+          },
+          "output_schema": {
+            "updated": { "type": "boolean" }
+          }
+        }
+      ],
+      "authentication": "api_key"
+    }
+  ],
+  
+  "available_tools": [
+    {
+      "name": "send_email",
+      "type": "notification",
+      "description": "Send email notification",
+      "input_schema": {
+        "to": { "type": "string" },
+        "subject": { "type": "string" },
+        "body": { "type": "string" },
+        "template": { "type": "string", "optional": true }
+      },
+      "output_schema": {
+        "sent": { "type": "boolean" },
+        "message_id": { "type": "string" }
+      },
+      "estimated_latency_ms": 800,
+      "cost_per_call": 0.001
+    },
+    {
+      "name": "log_transaction",
+      "type": "database",
+      "description": "Log transaction for audit trail",
+      "input_schema": {
+        "transaction_type": { "type": "string" },
+        "data": { "type": "object" }
+      },
+      "output_schema": {
+        "logged": { "type": "boolean" },
+        "log_id": { "type": "string" }
+      },
+      "estimated_latency_ms": 200,
+      "cost_per_call": 0.0001
+    }
+  ],
+  
+  "constraints": {
+    "max_iterations": 15,
+    "max_parallel_nodes": 3,
+    "timeout_ms": 45000,
+    "budget_limit": 0.50,
+    "required_validation": true,
+    "error_handling_strategy": "retry_with_fallback",
+    "max_retries": 3
+  },
+  
+  "context": {
+    "environment": "production",
+    "user_id": "usr_12345",
+    "session_id": "sess_abc789",
+    "request_id": "req_xyz456",
+    "timestamp": "2025-10-03T01:30:00Z",
+    "metadata": {
+      "customer_tier": "premium",
+      "region": "us-east-1",
+      "channel": "web"
+    }
+  },
+  
+  "preferences": {
+    "optimize_for": "reliability",
+    "parallelization": "balanced",
+    "logging_level": "verbose",
+    "include_monitoring": true,
+    "include_rollback": true,
+    "cache_intermediate_results": true
+  },
+  
+  "special_requirements": [
+    "Must comply with PCI-DSS for payment processing",
+    "All customer data must be encrypted in transit and at rest",
+    "Audit trail required for all financial transactions",
+    "GDPR compliance for EU customers",
+    "Fraud detection must run before payment processing"
+  ],
+  
+  "example_scenarios": [
+    {
+      "scenario": "Happy path - successful order",
+      "input": {
+        "order": {
+          "order_id": "ORD-001",
+          "customer_id": "CUST-123",
+          "items": [{ "sku": "PROD-456", "quantity": 2 }],
+          "total_amount": 99.99,
+          "payment_method": { "type": "credit_card" }
+        }
+      },
+      "expected_flow": [
+        "OrderValidator",
+        "InventoryChecker (parallel) + FraudDetector (parallel)",
+        "PaymentProcessor",
+        "NotificationService"
+      ],
+      "expected_output": {
+        "order_id": "ORD-001",
+        "status": "completed",
+        "transaction_id": "TXN-789",
+        "confirmation_sent": true
+      }
+    },
+    {
+      "scenario": "Validation failure",
+      "input": {
+        "order": {
+          "order_id": "ORD-002",
+          "items": []
+        }
+      },
+      "expected_flow": [
+        "OrderValidator (fails)",
+        "NotificationService (error notification)"
+      ],
+      "expected_output": {
+        "order_id": "ORD-002",
+        "status": "validation_failed",
+        "confirmation_sent": false
+      }
+    },
+    {
+      "scenario": "Out of stock",
+      "input": {
+        "order": {
+          "order_id": "ORD-003",
+          "customer_id": "CUST-456",
+          "items": [{ "sku": "PROD-OUT", "quantity": 100 }]
+        }
+      },
+      "expected_flow": [
+        "OrderValidator",
+        "InventoryChecker (fails - out of stock)",
+        "NotificationService (stock notification)"
+      ],
+      "expected_output": {
+        "order_id": "ORD-003",
+        "status": "out_of_stock",
+        "confirmation_sent": true
+      }
+    }
+  ]
+}
+

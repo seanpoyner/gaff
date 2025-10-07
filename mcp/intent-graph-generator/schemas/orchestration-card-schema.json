@@ -1,0 +1,273 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OrchestrationCard",
+  "description": "Complete context for generating an intent graph",
+  "type": "object",
+  "required": ["user_request", "available_agents"],
+  "properties": {
+    "user_request": {
+      "type": "object",
+      "required": ["description"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Natural language description of what needs to be accomplished"
+        },
+        "domain": {
+          "type": "string",
+          "description": "Domain context (e.g., 'e-commerce', 'finance', 'healthcare')"
+        },
+        "success_criteria": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "List of criteria that define successful completion"
+        },
+        "input_data": {
+          "type": "object",
+          "description": "Shape of input data that will be provided at runtime"
+        },
+        "expected_output": {
+          "type": "object",
+          "description": "Shape of expected output"
+        }
+      }
+    },
+    "available_agents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "capabilities", "input_schema", "output_schema"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Unique agent identifier"
+          },
+          "type": {
+            "type": "string",
+            "enum": ["llm", "api", "tool", "validator", "transformer", "aggregator", "router", "custom"],
+            "description": "Type of agent"
+          },
+          "capabilities": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "What this agent can do"
+          },
+          "input_schema": {
+            "type": "object",
+            "description": "JSON schema for agent inputs"
+          },
+          "output_schema": {
+            "type": "object",
+            "description": "JSON schema for agent outputs"
+          },
+          "description": {
+            "type": "string",
+            "description": "Human-readable description of agent purpose"
+          },
+          "estimated_latency_ms": {
+            "type": "number",
+            "description": "Expected execution time in milliseconds"
+          },
+          "cost_per_call": {
+            "type": "number",
+            "description": "Cost in USD per invocation"
+          },
+          "reliability_score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1,
+            "description": "Reliability score 0-1"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Other agents this depends on"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional agent metadata"
+          }
+        }
+      }
+    },
+    "available_mcp_servers": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "tools"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "MCP server identifier"
+          },
+          "url": {
+            "type": "string",
+            "description": "MCP server URL (e.g., 'mcp://localhost:3001')"
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "description": { "type": "string" },
+                "input_schema": { "type": "object" },
+                "output_schema": { "type": "object" }
+              }
+            },
+            "description": "Available tools from this server"
+          },
+          "authentication": {
+            "type": "string",
+            "enum": ["none", "api_key", "oauth", "custom"],
+            "description": "Authentication method"
+          }
+        }
+      }
+    },
+    "available_tools": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "type", "input_schema", "output_schema"],
+        "properties": {
+          "name": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["notification", "database", "api", "file", "calculation", "custom"]
+          },
+          "description": { "type": "string" },
+          "input_schema": { "type": "object" },
+          "output_schema": { "type": "object" },
+          "estimated_latency_ms": { "type": "number" },
+          "cost_per_call": { "type": "number" }
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "properties": {
+        "max_iterations": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 100,
+          "default": 10,
+          "description": "Maximum number of agent executions"
+        },
+        "max_parallel_nodes": {
+          "type": "integer",
+          "minimum": 1,
+          "default": 5,
+          "description": "Maximum nodes that can execute in parallel"
+        },
+        "timeout_ms": {
+          "type": "integer",
+          "minimum": 1000,
+          "default": 30000,
+          "description": "Overall execution timeout"
+        },
+        "budget_limit": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum cost in USD"
+        },
+        "required_validation": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether validation is mandatory"
+        },
+        "error_handling_strategy": {
+          "type": "string",
+          "enum": ["fail_fast", "retry", "fallback", "retry_with_fallback", "continue"],
+          "default": "retry_with_fallback"
+        },
+        "max_retries": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 3
+        },
+        "allowed_agent_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Restrict which agent types can be used"
+        }
+      }
+    },
+    "context": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "type": "string",
+          "enum": ["development", "staging", "production"],
+          "description": "Execution environment"
+        },
+        "user_id": { "type": "string" },
+        "session_id": { "type": "string" },
+        "request_id": { "type": "string" },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "metadata": {
+          "type": "object",
+          "description": "Additional context metadata"
+        }
+      }
+    },
+    "preferences": {
+      "type": "object",
+      "properties": {
+        "optimize_for": {
+          "type": "string",
+          "enum": ["speed", "cost", "reliability", "balanced"],
+          "default": "balanced",
+          "description": "Primary optimization goal"
+        },
+        "parallelization": {
+          "type": "string",
+          "enum": ["none", "conservative", "balanced", "aggressive"],
+          "default": "balanced",
+          "description": "How aggressively to parallelize"
+        },
+        "logging_level": {
+          "type": "string",
+          "enum": ["minimal", "normal", "verbose", "debug"],
+          "default": "normal"
+        },
+        "include_monitoring": {
+          "type": "boolean",
+          "default": true,
+          "description": "Include monitoring/observability nodes"
+        },
+        "include_rollback": {
+          "type": "boolean",
+          "default": false,
+          "description": "Include rollback capabilities"
+        },
+        "cache_intermediate_results": {
+          "type": "boolean",
+          "default": true
+        }
+      }
+    },
+    "special_requirements": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Domain-specific requirements (compliance, security, etc.)"
+    },
+    "example_scenarios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario": { "type": "string" },
+          "input": { "type": "object" },
+          "expected_flow": { "type": "array", "items": { "type": "string" } },
+          "expected_output": { "type": "object" }
+        }
+      },
+      "description": "Example execution scenarios to guide graph generation"
+    }
+  }
+}
+

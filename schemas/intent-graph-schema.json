@@ -1,0 +1,122 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IntentGraph",
+  "description": "Executable intent graph schema (DAG)",
+  "type": "object",
+  "required": ["graph_id", "nodes", "edges"],
+  "properties": {
+    "graph_id": {
+      "type": "string",
+      "description": "Unique graph identifier"
+    },
+    "name": {
+      "type": "string",
+      "description": "Human-readable graph name"
+    },
+    "description": {
+      "type": "string",
+      "description": "Graph description"
+    },
+    "version": {
+      "type": "string",
+      "description": "Graph version"
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "agent", "description"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique node identifier"
+          },
+          "agent": {
+            "type": "string",
+            "description": "Agent name to execute this node"
+          },
+          "tool": {
+            "type": "string",
+            "description": "Tool name if using MCP tool"
+          },
+          "description": {
+            "type": "string",
+            "description": "What this node does"
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Detailed instructions for agent execution"
+          },
+          "input": {
+            "type": "object",
+            "description": "Input parameters"
+          },
+          "output_mapping": {
+            "type": "object",
+            "description": "How to map outputs for downstream nodes"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Node IDs this depends on"
+          },
+          "timeout_ms": {
+            "type": "integer",
+            "description": "Node-specific timeout"
+          },
+          "retry_policy": {
+            "type": "object",
+            "description": "Node-specific retry policy"
+          },
+          "metadata": {
+            "type": "object",
+            "description": "Additional metadata"
+          }
+        }
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["from", "to"],
+        "properties": {
+          "from": {
+            "type": "string",
+            "description": "Source node ID"
+          },
+          "to": {
+            "type": "string",
+            "description": "Target node ID"
+          },
+          "condition": {
+            "type": "string",
+            "description": "Condition for edge traversal"
+          },
+          "data_mapping": {
+            "type": "object",
+            "description": "Data transformations along edge"
+          },
+          "edge_type": {
+            "type": "string",
+            "enum": ["sequential", "parallel", "conditional"],
+            "description": "Type of edge"
+          }
+        }
+      }
+    },
+    "execution_plan": {
+      "type": "object",
+      "description": "Execution strategy and metadata"
+    },
+    "error_handling": {
+      "type": "object",
+      "description": "Error handling configuration"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional graph metadata"
+    }
+  }
+}
+

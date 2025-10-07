@@ -1,0 +1,496 @@
+#!/usr/bin/env node
+
+/**
+ * GAFF Gateway - Unified Entry Point to All GAFF MCP Servers
+ * 
+ * Provides a single MCP server that aggregates tools from all GAFF components:
+ * - memory
+ * - agent-orchestration  
+ * - intent-graph-generator
+ * - safety-protocols
+ * - tools
+ * - quality-check
+ * - router
+ * 
+ * Benefits:
+ * - Single connection for agents (vs 7 separate connections)
+ * - Unified namespace for all GAFF tools
+ * - High-level workflow composition
+ * - Simplified configuration
+ * 
+ * Author: Sean Poyner <sean.poyner@pm.me>
+ */
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListToolsRequestSchema,
+  Tool,
+} from "@modelcontextprotocol/sdk/types.js";
+import { readFileSync } from "fs";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
+import { ServerRouter } from "./server-router.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+/**
+ * GAFF Gateway Server
+ */
+class GaffGateway {
+  private server: Server;
+  private tools: Tool[] = [];
+  private router: ServerRouter;
+  
+  constructor() {
+    this.router = new ServerRouter();
+    this.server = new Server(
+      {
+        name: "gaff-gateway",
+        version: "1.0.0",
+      },
+      {
+        capabilities: {
+          tools: {},
+        },
+      }
+    );
+    
+    this.setupHandlers();
+    this.loadTools();
+  }
+  
+  /**
+   * Load gaff.json configuration
+   */
+  private loadGaffConfig() {
+    try {
+      const configPath = process.env.GAFF_CONFIG_PATH || resolve(__dirname, "../../../gaff.json");
+      const config = JSON.parse(readFileSync(configPath, "utf-8"));
+      return config;
+    } catch (error) {
+      console.error("⚠️  Could not load gaff.json:", error);
+      return null;
+    }
+  }
+  
+  /**
+   * Load and aggregate tools from all GAFF servers
+   */
+  private loadTools() {
+    const config = this.loadGaffConfig();
+    
+    // Define all GAFF tools with server prefixes
+    this.tools = [
+      // ========================================
+      // HIGH-LEVEL WORKFLOW TOOLS (Gateway-specific)
+      // ========================================
+      {
+        name: "gaff_create_and_execute_workflow",
+        description: "🚀 END-TO-END: Natural language → Orchestration card → Intent graph → Execution → Quality check. " +
+                     "This is the main GAFF workflow that composes all servers.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: {
+              type: "string",
+              description: "Natural language description of the workflow to create and execute"
+            },
+            options: {
+              type: "object",
+              properties: {
+                validate_safety: { type: "boolean", description: "Run safety validation (default: true)" },
+                optimize_graph: { type: "boolean", description: "Optimize the intent graph (default: true)" },
+                quality_check: { type: "boolean", description: "Run quality validation after execution (default: true)" },
+                store_in_memory: { type: "boolean", description: "Store results in memory (default: true)" },
+                execution_mode: { type: "string", enum: ["sync", "async"], description: "Execution mode (default: sync)" }
+              }
+            }
+          },
+          required: ["query"]
+        }
+      },
+      
+      // ========================================
+      // MEMORY SERVER TOOLS
+      // ========================================
+      {
+        name: "memory_create_entities",
+        description: "[MEMORY] Create entities in the knowledge graph (orchestration cards, graphs, results, etc.)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            entities: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  name: { type: "string" },
+                  entityType: { type: "string" },
+                  observations: { type: "array", items: { type: "string" } }
+                },
+                required: ["name", "entityType", "observations"]
+              }
+            }
+          },
+          required: ["entities"]
+        }
+      },
+      
+      {
+        name: "memory_search_nodes",
+        description: "[MEMORY] Search the knowledge graph for entities matching a query",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: { type: "string", description: "Search query" }
+          },
+          required: ["query"]
+        }
+      },
+      
+      {
+        name: "memory_read_graph",
+        description: "[MEMORY] Read the entire knowledge graph",
+        inputSchema: { type: "object", properties: {} }
+      },
+      
+      // ========================================
+      // AGENT-ORCHESTRATION TOOLS
+      // ========================================
+      {
+        name: "orchestration_generate_card",
+        description: "[ORCHESTRATION] Convert natural language query to orchestration card using gaff.json agents",
+        inputSchema: {
+          type: "object",
+          properties: {
+            query: { type: "string", description: "Natural language workflow description" },
+            gaff_config: { type: "object", description: "Optional: gaff.json config (auto-loaded if not provided)" },
+            store_in_memory: { type: "boolean", description: "Store card in memory (default: true)" }
+          },
+          required: ["query"]
+        }
+      },
+      
+      {
+        name: "orchestration_list_agents",
+        description: "[ORCHESTRATION] List all available agents from gaff.json",
+        inputSchema: {
+          type: "object",
+          properties: {
+            filter_by_capability: { type: "string", description: "Optional: filter agents by capability" }
+          }
+        }
+      },
+      
+      // ========================================
+      // INTENT-GRAPH-GENERATOR TOOLS
+      // ========================================
+      {
+        name: "graph_generate",
+        description: "[GRAPH] Generate intent graph from orchestration card using AI",
+        inputSchema: {
+          type: "object",
+          properties: {
+            orchestration_card: { type: "object", description: "Orchestration card to convert" },
+            options: {
+              type: "object",
+              properties: {
+                validate: { type: "boolean" },
+                optimize: { type: "boolean" },
+                store_in_memory: { type: "boolean" }
+              }
+            }
+          },
+          required: ["orchestration_card"]
+        }
+      },
+      
+      {
+        name: "graph_visualize",
+        description: "[GRAPH] Generate Mermaid diagram visualization of an intent graph",
+        inputSchema: {
+          type: "object",
+          properties: {
+            graph: { type: "object", description: "Intent graph to visualize" },
+            options: {
+              type: "object",
+              properties: {
+                style: { type: "string", enum: ["basic", "detailed", "complete"] },
+                direction: { type: "string", enum: ["TB", "LR"] }
+              }
+            }
+          },
+          required: ["graph"]
+        }
+      },
+      
+      // ========================================
+      // ROUTER TOOLS
+      // ========================================
+      {
+        name: "router_execute_graph",
+        description: "[ROUTER] Execute an intent graph by routing to appropriate agents",
+        inputSchema: {
+          type: "object",
+          properties: {
+            graph: { type: "object", description: "Intent graph to execute" },
+            execution_mode: { type: "string", enum: ["sync", "async"], description: "Execution mode" },
+            context: { type: "object", description: "Additional execution context" }
+          },
+          required: ["graph"]
+        }
+      },
+      
+      {
+        name: "router_get_execution_status",
+        description: "[ROUTER] Get status of async execution",
+        inputSchema: {
+          type: "object",
+          properties: {
+            execution_id: { type: "string", description: "Execution ID to check" }
+          },
+          required: ["execution_id"]
+        }
+      },
+      
+      // ========================================
+      // QUALITY-CHECK TOOLS
+      // ========================================
+      {
+        name: "quality_validate_result",
+        description: "[QUALITY] Validate execution result against quality criteria and determine if rerun needed",
+        inputSchema: {
+          type: "object",
+          properties: {
+            execution_result: { type: "object", description: "Result to validate" },
+            quality_criteria: { type: "object", description: "Quality thresholds and requirements" },
+            intent_graph: { type: "object", description: "Original intent graph for context" }
+          },
+          required: ["execution_result"]
+        }
+      },
+      
+      // ========================================
+      // SAFETY-PROTOCOLS TOOLS
+      // ========================================
+      {
+        name: "safety_validate_compliance",
+        description: "[SAFETY] Validate compliance with GDPR, CCPA, SOC2, etc.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            orchestration_card: { type: "object", description: "Card to validate" },
+            compliance_requirements: { type: "array", items: { type: "string" }, description: "Required compliance standards" }
+          },
+          required: ["orchestration_card"]
+        }
+      },
+      
+      {
+        name: "safety_check_guardrails",
+        description: "[SAFETY] Check for PII, unsafe content, rate limits, etc.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            data: { type: "object", description: "Data to check" },
+            guardrail_types: { type: "array", items: { type: "string" }, description: "Types of guardrails to apply" }
+          },
+          required: ["data"]
+        }
+      },
+      
+      // ========================================
+      // TOOLS (UTILITIES + HITL)
+      // ========================================
+      {
+        name: "tools_human_in_the_loop",
+        description: "[TOOLS] 🚨 Pause execution and request human approval for critical actions",
+        inputSchema: {
+          type: "object",
+          properties: {
+            action_description: { type: "string", description: "Clear description of the action requiring approval" },
+            action_type: { type: "string", enum: ["approval", "confirmation", "review", "input"] },
+            context: { type: "object", description: "Full context about the action" },
+            approval_options: {
+              type: "object",
+              properties: {
+                type: { type: "string", enum: ["yes_no", "multi_choice", "text_input"] },
+                choices: { type: "array", items: { type: "string" } },
+                timeout_seconds: { type: "number" }
+              }
+            }
+          },
+          required: ["action_description", "action_type"]
+        }
+      },
+      
+      {
+        name: "tools_format_data",
+        description: "[TOOLS] Convert data between JSON, XML, YAML, CSV formats",
+        inputSchema: {
+          type: "object",
+          properties: {
+            data: { type: "string", description: "Data to convert" },
+            source_format: { type: "string", enum: ["json", "xml", "yaml", "csv"] },
+            target_format: { type: "string", enum: ["json", "xml", "yaml", "csv"] }
+          },
+          required: ["data", "source_format", "target_format"]
+        }
+      },
+      
+      // ========================================
+      // SANDBOX TOOLS (Code Execution)
+      // ========================================
+      {
+        name: "sandbox_execute_code",
+        description: "[SANDBOX] 🔒 Execute code safely in isolated environment (Python, JavaScript, Shell)",
+        inputSchema: {
+          type: "object",
+          properties: {
+            language: {
+              type: "string",
+              enum: ["python", "javascript", "shell"],
+              description: "Programming language to execute"
+            },
+            code: {
+              type: "string",
+              description: "Code to execute in sandboxed environment"
+            },
+            timeout: {
+              type: "number",
+              description: "Execution timeout in seconds (default: 30)"
+            }
+          },
+          required: ["language", "code"]
+        }
+      },
+      
+      // ========================================
+      // SEQUENTIAL THINKING TOOLS (Reasoning)
+      // ========================================
+      {
+        name: "thinking_sequential",
+        description: "[THINKING] 🧠 Break down complex problems into sequential thought steps for transparent reasoning",
+        inputSchema: {
+          type: "object",
+          properties: {
+            thought: {
+              type: "string",
+              description: "Current thinking step"
+            },
+            nextThoughtNeeded: {
+              type: "boolean",
+              description: "Whether another thought step is needed"
+            },
+            thoughtNumber: {
+              type: "integer",
+              description: "Current thought number in sequence",
+              minimum: 1
+            },
+            totalThoughts: {
+              type: "integer",
+              description: "Estimated total thoughts needed (adjustable)",
+              minimum: 1
+            },
+            isRevision: {
+              type: "boolean",
+              description: "Whether this thought revises previous thinking"
+            },
+            revisesThought: {
+              type: "integer",
+              description: "Which thought number is being reconsidered",
+              minimum: 1
+            },
+            branchFromThought: {
+              type: "integer",
+              description: "Branching point thought number",
+              minimum: 1
+            },
+            branchId: {
+              type: "string",
+              description: "Branch identifier"
+            },
+            needsMoreThoughts: {
+              type: "boolean",
+              description: "If more thoughts are needed than originally estimated"
+            }
+          },
+          required: ["thought", "nextThoughtNeeded", "thoughtNumber", "totalThoughts"]
+        }
+      },
+    ];
+    
+    console.error(`✅ Loaded ${this.tools.length} tools from GAFF servers`);
+    console.error(`📦 Servers: memory, orchestration, graph-gen, router, quality, safety, tools, sandbox, thinking`);
+  }
+  
+  /**
+   * Setup request handlers
+   */
+  private setupHandlers() {
+    // List available tools
+    this.server.setRequestHandler(ListToolsRequestSchema, async () => ({
+      tools: this.tools,
+    }));
+    
+    // Handle tool calls
+    this.server.setRequestHandler(CallToolRequestSchema, async (request) => {
+      const { name, arguments: args } = request.params;
+      
+      console.error(`🔧 Gateway received tool call: ${name}`);
+      
+      // Route to appropriate handler
+      if (name === "gaff_create_and_execute_workflow") {
+        return await this.handleEndToEndWorkflow(args as any);
+      }
+      
+      // Route all other tools to their respective servers
+      return await this.router.routeToolCall(name, args);
+    });
+  }
+  
+  /**
+   * Handle the main end-to-end workflow
+   */
+  private async handleEndToEndWorkflow(args: any) {
+    const { query, options = {} } = args;
+    
+    return {
+      content: [{
+        type: "text",
+        text: `🚀 GAFF End-to-End Workflow\n\n` +
+              `Query: "${query}"\n\n` +
+              `This would execute:\n` +
+              `1. ✅ agent-orchestration.generate_orchestration_card()\n` +
+              `2. ✅ safety-protocols.validate_compliance() ${options.validate_safety !== false ? "" : "(skipped)"}\n` +
+              `3. ✅ intent-graph-generator.generate_intent_graph()\n` +
+              `4. ✅ router.execute_graph()\n` +
+              `5. ✅ quality-check.validate_execution_result() ${options.quality_check !== false ? "" : "(skipped)"}\n` +
+              `6. ✅ memory.create_entities() (store results) ${options.store_in_memory !== false ? "" : "(skipped)"}\n\n` +
+              `Full server-to-server routing coming in next phase!\n\n` +
+              `This demonstrates the gateway concept: single tool call orchestrates entire workflow.`
+      }]
+    };
+  }
+  
+  /**
+   * Start the gateway server
+   */
+  async start() {
+    const transport = new StdioServerTransport();
+    await this.server.connect(transport);
+    console.error("✅ GAFF Gateway running on stdio");
+    console.error(`🌐 Unified access to ${this.tools.length} tools from all GAFF servers`);
+  }
+}
+
+// Start the gateway
+const gateway = new GaffGateway();
+gateway.start().catch((error) => {
+  console.error("❌ Fatal error:", error);
+  process.exit(1);
+});
+

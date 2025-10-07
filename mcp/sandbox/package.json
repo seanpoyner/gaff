@@ -1,0 +1,39 @@
+{
+  "name": "gaff-sandbox-server",
+  "version": "1.0.0",
+  "description": "Official MCP sandbox server bundled with GAFF for safe code execution",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "gaff-sandbox": "index.js"
+  },
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "sandbox",
+    "code-execution",
+    "gaff"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server-sandbox": "latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanpoyner/gaff.git",
+    "directory": "mcp/sandbox"
+  },
+  "bugs": {
+    "url": "https://github.com/seanpoyner/gaff/issues"
+  },
+  "homepage": "https://github.com/seanpoyner/gaff#readme"
+}
+

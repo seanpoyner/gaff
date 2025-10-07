@@ -1,0 +1,81 @@
+{
+  "name": "intent-graph-mcp-server",
+  "version": "2.2.3",
+  "description": "Universal LLM-powered MCP server for automated Intent Graph generation (Writer Palmyra, Claude, OpenAI, custom)",
+  "type": "module",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "bin": {
+    "intent-graph-mcp-server": "build/index.js"
+  },
+  "files": [
+    "build/**/*.js",
+    "build/**/*.d.ts",
+    "!build/test.js",
+    "!build/test.d.ts",
+    "!build/test-utils.js",
+    "!build/test-utils.d.ts",
+    "!build/storage.js",
+    "!build/storage.d.ts",
+    "!build/tools.js",
+    "!build/tools.d.ts",
+    "README.md",
+    "LICENSE",
+    "ARCHITECTURE_V2.md",
+    "CONTRIBUTING.md",
+    "OPEN_SOURCE.md",
+    "schemas/",
+    "examples/"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node build/index.js",
+    "start:http": "node build/http-server.js",
+    "dev": "tsc && node build/index.js",
+    "dev:http": "tsc && node build/http-server.js",
+    "prepare": "npm run build",
+    "watch": "tsc --watch",
+    "test": "tsc && node build/test-v2.js"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "intent-graph",
+    "agent-orchestration",
+    "ai-agents",
+    "workflow-automation",
+    "graph-builder",
+    "cursor",
+    "claude",
+    "palmyra",
+    "writer-ai",
+    "llm-powered",
+    "orchestration-card"
+  ],
+  "author": "Sean Poyner <sean.poyner@pm.me>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/seanpoyner/gaff.git",
+    "directory": "mcp/intent-graph-generator"
+  },
+  "bugs": {
+    "url": "https://github.com/seanpoyner/gaff/issues"
+  },
+  "homepage": "https://github.com/seanpoyner/gaff/tree/main/mcp/intent-graph-generator#readme",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.3",
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

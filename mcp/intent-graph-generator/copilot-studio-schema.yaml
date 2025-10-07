@@ -1,0 +1,98 @@
+swagger: '2.0'
+info:
+  title: IntentGraph MCP Server
+  description: Universal LLM-powered MCP server for automated Intent Graph generation. Supports Writer Palmyra, Claude, OpenAI, and custom endpoints. Generate complete workflow graphs from orchestration cards with AI-powered reasoning.
+  version: '2.0.0'
+  contact:
+    name: Sean Poyner
+    email: sean.poyner@pm.me
+host: your-server-url.com
+basePath: /
+schemes:
+  - https
+paths:
+  /mcp:
+    post:
+      summary: IntentGraph MCP Server - Generate and manage intent graphs
+      description: Main MCP endpoint for intent graph generation, validation, optimization, and export
+      x-ms-agentic-protocol: mcp-streamable-1.0
+      operationId: InvokeMCP
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: body
+          description: MCP JSON-RPC request
+          required: true
+          schema:
+            type: object
+            properties:
+              jsonrpc:
+                type: string
+                example: "2.0"
+              id:
+                type: string
+                example: "1"
+              method:
+                type: string
+                enum:
+                  - tools/list
+                  - tools/call
+                example: "tools/call"
+              params:
+                type: object
+                properties:
+                  name:
+                    type: string
+                    enum:
+                      - generate_intent_graph
+                      - validate_graph
+                      - analyze_graph
+                      - optimize_graph
+                      - export_graph
+                      - visualize_graph
+                      - generate_artifacts
+                  arguments:
+                    type: object
+      responses:
+        '200':
+          description: Success
+          schema:
+            type: object
+            properties:
+              jsonrpc:
+                type: string
+              id:
+                type: string
+              result:
+                type: object
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Check if the server is running and get server information
+      operationId: HealthCheck
+      produces:
+        - application/json
+      responses:
+        '200':
+          description: Server is healthy
+          schema:
+            type: object
+            properties:
+              status:
+                type: string
+              version:
+                type: string
+              server:
+                type: string
+              transport:
+                type: string
+              tools:
+                type: number
+

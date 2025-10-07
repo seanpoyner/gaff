@@ -169,9 +169,11 @@ export class ServerRouter {
       
       try {
         // Spawn the child MCP server
+        // On Windows, we need shell: true to properly resolve .cmd files like npx.cmd
         const child = spawn(serverConfig.command, serverConfig.args, {
           stdio: ['pipe', 'pipe', 'pipe'],
           env: process.env,
+          shell: true, // Required for Windows to find npx.cmd
         });
         
         let stdoutData = '';

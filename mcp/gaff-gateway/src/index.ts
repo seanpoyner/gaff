@@ -309,6 +309,61 @@ class GaffGateway {
         }
       },
       
+      {
+        name: "safety_validate_input",
+        description: "[SAFETY] Pre-execution input validation for size, format, and schema compliance",
+        inputSchema: {
+          type: "object",
+          properties: {
+            input_data: { type: "object", description: "Input data to validate" },
+            validation_rules: { type: "object", description: "Validation rules including max size, allowed formats, schema" }
+          },
+          required: ["input_data", "validation_rules"]
+        }
+      },
+      
+      {
+        name: "safety_validate_output",
+        description: "[SAFETY] Post-execution output validation for safety, compliance, and schema adherence",
+        inputSchema: {
+          type: "object",
+          properties: {
+            output_data: { type: "object", description: "Output data to validate" },
+            validation_rules: { type: "object", description: "Validation rules for output" }
+          },
+          required: ["output_data", "validation_rules"]
+        }
+      },
+      
+      {
+        name: "safety_enforce_rate_limits",
+        description: "[SAFETY] Checks and enforces rate limits per user, IP, and endpoint",
+        inputSchema: {
+          type: "object",
+          properties: {
+            user_id: { type: "string", description: "User identifier" },
+            ip_address: { type: "string", description: "IP address of the request" },
+            endpoint: { type: "string", description: "Endpoint being accessed" }
+          },
+          required: ["user_id", "ip_address", "endpoint"]
+        }
+      },
+      
+      {
+        name: "safety_audit_log",
+        description: "[SAFETY] Creates security audit log entries for compliance and monitoring",
+        inputSchema: {
+          type: "object",
+          properties: {
+            event_type: { type: "string", description: "Type of event (e.g., 'access', 'violation', 'error')" },
+            user_id: { type: "string", description: "User identifier" },
+            action: { type: "string", description: "Action taken" },
+            metadata: { type: "object", description: "Additional context and metadata" }
+          },
+          required: ["event_type", "user_id", "action"]
+        }
+      },
+      
       // ========================================
       // TOOLS (UTILITIES + HITL)
       // ========================================

@@ -166,7 +166,12 @@ export class ServerRouter {
     const toolMappings: Record<string, string> = {
       'visualize': 'visualize_graph',
       'generate': 'generate_intent_graph',
-      'generate_card': 'generate_orchestration_card'
+      'generate_card': 'generate_orchestration_card',
+      // Safety tools - these match the server names
+      'validate_input': 'validate_input',
+      'validate_output': 'validate_output',
+      'enforce_rate_limits': 'enforce_rate_limits',
+      'audit_log': 'audit_log'
     };
     
     if (toolMappings[toolBaseName]) {

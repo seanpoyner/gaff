@@ -128,9 +128,8 @@ export class ServerRouter {
       };
     }
     
-    // For now, return a simulation of the call
-    // Full implementation would spawn the server and communicate via stdio
-    return this.simulateServerCall(serverConfig, toolName, args);
+    // Actually call the server
+    return this.callServer(serverConfig, toolName, args);
   }
   
   /**
@@ -149,6 +148,116 @@ export class ServerRouter {
     }
     
     return null;
+  }
+  
+  /**
+   * Actually call a server (Phase 2B - Real Implementation)
+   * 
+   * Spawns the child MCP server and communicates via JSON-RPC over stdio
+   */
+  private async callServer(
+    serverConfig: ServerConfig,
+    toolName: string,
+    args: any
+  ): Promise<CallToolResult> {
+    const toolBaseName = toolName.replace(serverConfig.toolPrefix, '');
+    
+    return new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error(`Server ${serverConfig.name} timed out after 30s`));
+      }, 30000);
+      
+      try {
+        // Spawn the child MCP server
+        const child = spawn(serverConfig.command, serverConfig.args, {
+          stdio: ['pipe', 'pipe', 'pipe'],
+          env: process.env,
+        });
+        
+        let stdoutData = '';
+        let stderrData = '';
+        let responseParsed = false;
+        
+        // Collect stdout
+        child.stdout.on('data', (data) => {
+          stdoutData += data.toString();
+          
+          // Try to parse JSON-RPC response
+          const lines = stdoutData.split('\n');
+          for (const line of lines) {
+            if (!line.trim()) continue;
+            
+            try {
+              const response = JSON.parse(line);
+              if (response.result && !responseParsed) {
+                responseParsed = true;
+                clearTimeout(timeout);
+                child.kill();
+                
+                // Return the tool call result
+                resolve(response.result);
+              }
+            } catch (e) {
+              // Not valid JSON yet, keep accumulating
+            }
+          }
+        });
+        
+        // Collect stderr for logging
+        child.stderr.on('data', (data) => {
+          stderrData += data.toString();
+          // Log server errors but don't fail
+          console.error(`[${serverConfig.name}] ${data.toString().trim()}`);
+        });
+        
+        // Handle process errors
+        child.on('error', (err) => {
+          clearTimeout(timeout);
+          resolve({
+            content: [{
+              type: "text",
+              text: `❌ Failed to start server ${serverConfig.name}: ${err.message}`
+            }]
+          });
+        });
+        
+        // Handle process exit
+        child.on('exit', (code) => {
+          if (!responseParsed) {
+            clearTimeout(timeout);
+            resolve({
+              content: [{
+                type: "text",
+                text: `❌ Server ${serverConfig.name} exited with code ${code}\n\nStderr: ${stderrData}`
+              }]
+            });
+          }
+        });
+        
+        // Send JSON-RPC request for tool call
+        const request = {
+          jsonrpc: "2.0",
+          id: Date.now(),
+          method: "tools/call",
+          params: {
+            name: toolBaseName,
+            arguments: args
+          }
+        };
+        
+        child.stdin.write(JSON.stringify(request) + '\n');
+        child.stdin.end();
+        
+      } catch (error: any) {
+        clearTimeout(timeout);
+        resolve({
+          content: [{
+            type: "text",
+            text: `❌ Error calling server ${serverConfig.name}: ${error.message}`
+          }]
+        });
+      }
+    });
   }
   
   /**

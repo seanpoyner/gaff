@@ -1,6 +1,6 @@
 {
   "name": "@seanpoyner/gaff",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "GAFF - Graphical Agentic Flow Framework: Complete MCP server suite for AI agent orchestration (meta-package)",
   "type": "module",
   "bin": {
@@ -43,7 +43,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "gaff-gateway": "^1.0.0",
+    "gaff-gateway": "^1.0.1",
     "agent-orchestration-mcp-server": "^1.0.1",
     "intent-graph-mcp-server": "^2.2.4",
     "router-mcp-server": "^1.0.1",

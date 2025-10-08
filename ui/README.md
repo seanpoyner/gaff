@@ -91,6 +91,25 @@ node openai-adapter.js
 node server.js
 ```
 
+## 🧪 Testing
+
+### Quick Tests
+
+```bash
+# Check all dependencies
+.\test-dependencies.ps1
+
+# Quick functional test
+node test-quick-start.js
+```
+
+### Advanced Tests
+
+For component testing and debugging, see [`tests/README.md`](tests/README.md):
+- Individual component tests
+- Integration test suite
+- Debugging tools
+
 ## 🐳 Docker Deployment
 
 ```bash

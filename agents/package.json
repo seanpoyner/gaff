@@ -1,6 +1,6 @@
 {
   "name": "gaff-agents",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Internal GAFF agents that use GAFF's MCP servers",
   "type": "module",
   "main": "gaff-agent-base.js",
@@ -30,4 +30,3 @@
     "typescript": "^5.9.3"
   }
 }
-

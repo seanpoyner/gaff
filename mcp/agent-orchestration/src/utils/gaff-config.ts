@@ -53,9 +53,21 @@ export function loadGaffConfig(configOrPath?: any): GaffConfig {
   }
   
   // Otherwise load from file
-  const configPath = typeof configOrPath === 'string' 
-    ? configOrPath 
-    : process.env.GAFF_CONFIG_PATH || resolve(process.cwd(), 'gaff.json');
+  let configPath: string;
+  
+  if (typeof configOrPath === 'string') {
+    // Explicit path provided
+    configPath = configOrPath;
+  } else if (process.env.GAFF_CONFIG_PATH) {
+    // Full path to config file
+    configPath = process.env.GAFF_CONFIG_PATH;
+  } else if (process.env.GAFF_ROOT) {
+    // Project root directory
+    configPath = resolve(process.env.GAFF_ROOT, 'gaff.json');
+  } else {
+    // Fall back to current working directory
+    configPath = resolve(process.cwd(), 'gaff.json');
+  }
   
   try {
     const content = readFileSync(configPath, 'utf-8');

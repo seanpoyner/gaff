@@ -20,6 +20,9 @@ import { dirname, resolve } from 'path';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+// Set GAFF_ROOT to project root so MCP servers can find gaff.json
+process.env.GAFF_ROOT = resolve(__dirname, '..');
+
 const app = express();
 const PORT = process.env.PORT || 3100;
 
@@ -135,10 +138,9 @@ async function executeWorkflow(userQuery) {
       query: cleanQuery,
       generation_mode: 'use_configured_api',
       store_in_memory: true,
-    },
-    _meta: {
-      timeout: 180000 // 3 minutes for LLM calls
     }
+  }, undefined, {
+    timeout: 300000 // 5 minutes for LLM calls
   });
   const orchData = JSON.parse(orchResult.content[0].text);
   console.log(`✅ Orchestration card generated (${orchData.memory_key})`);
@@ -153,10 +155,9 @@ async function executeWorkflow(userQuery) {
     arguments: {
       orchestration_card: orchData.orchestration_card,
       options: { validate: true, optimize: true, store_in_memory: true },
-    },
-    _meta: {
-      timeout: 180000 // 3 minutes for LLM calls
     }
+  }, undefined, {
+    timeout: 300000 // 5 minutes for LLM calls
   });
   
   const graphData = JSON.parse(graphResult.content[0].text);
@@ -175,10 +176,9 @@ async function executeWorkflow(userQuery) {
       graph: graphData.intent_graph,
       context: { user_query: userQuery, timestamp: new Date().toISOString() },
       config: { max_parallel: 3, enable_hitl: false, store_state_in_memory: true, timeout_ms: 300000 },
-    },
-    _meta: {
-      timeout: 180000 // 3 minute timeout for long-running workflows with LLM calls
     }
+  }, undefined, {
+    timeout: 300000 // 5 minute timeout for long-running workflows with LLM calls
   });
   const execData = JSON.parse(execResult.content[0].text);
   console.log(`✅ Workflow executed (${execData.status})`);
@@ -555,7 +555,7 @@ app.get('/v1/openapi.json', (req, res) => {
 });
 
 // Start
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`\n${'='.repeat(60)}`);
   console.log('🔌 GAFF OpenAI-Compatible API Adapter');
   console.log(`${'='.repeat(60)}`);
@@ -567,6 +567,11 @@ app.listen(PORT, () => {
   console.log(`${'='.repeat(60)}\n`);
   console.log('⏳ MCP servers will initialize on first request...\n');
 });
+
+// Set timeout to 10 minutes for long-running GAFF workflows
+server.timeout = 600000; // 10 minutes
+server.keepAliveTimeout = 610000; // Slightly higher than timeout
+server.headersTimeout = 615000; // Slightly higher than keepAliveTimeout
 
 process.on('SIGINT', async () => {
   console.log('\n👋 Shutting down...');

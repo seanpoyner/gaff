@@ -22,11 +22,21 @@ export class WorkflowDemoAgent {
      */
     async initialize() {
         console.log('🚀 Initializing Workflow Demo Agent...');
-        // Connect to agent-orchestration (published package)
+        // Ensure GAFF_ROOT is set if not already
+        if (!process.env.GAFF_ROOT) {
+            // Default to parent directory of this script
+            const scriptDir = new URL('.', import.meta.url).pathname;
+            process.env.GAFF_ROOT = scriptDir.replace(/^\/([A-Z]:)/, '$1').replace(/\/agents\/examples\/$/, '');
+        }
+        // Connect to agent-orchestration (local build)
         console.log('📦 Connecting to agent-orchestration...');
         const agentOrchTransport = new StdioClientTransport({
-            command: 'npx',
-            args: ['-y', 'agent-orchestration-mcp-server'],
+            command: 'node',
+            args: ['C:/Users/seanp/projects/gaff/mcp/agent-orchestration/build/index.js'],
+            env: {
+                ...process.env,
+                GAFF_ROOT: process.env.GAFF_ROOT
+            }
         });
         this.agentOrchestrationClient = new Client({ name: 'workflow-demo-agent', version: '1.0.0' }, { capabilities: {} });
         await this.agentOrchestrationClient.connect(agentOrchTransport);
@@ -36,6 +46,10 @@ export class WorkflowDemoAgent {
         const intentGraphTransport = new StdioClientTransport({
             command: 'node',
             args: ['C:/Users/seanp/projects/gaff/mcp/intent-graph-generator/build/index.js'],
+            env: {
+                ...process.env,
+                GAFF_ROOT: process.env.GAFF_ROOT
+            }
         });
         this.intentGraphClient = new Client({ name: 'workflow-demo-agent', version: '1.0.0' }, { capabilities: {} });
         await this.intentGraphClient.connect(intentGraphTransport);
@@ -45,6 +59,10 @@ export class WorkflowDemoAgent {
         const routerTransport = new StdioClientTransport({
             command: 'npx',
             args: ['-y', 'router-mcp-server'],
+            env: {
+                ...process.env,
+                GAFF_ROOT: process.env.GAFF_ROOT
+            }
         });
         this.routerClient = new Client({ name: 'workflow-demo-agent', version: '1.0.0' }, { capabilities: {} });
         await this.routerClient.connect(routerTransport);
@@ -54,6 +72,7 @@ export class WorkflowDemoAgent {
         const memoryTransport = new StdioClientTransport({
             command: 'npx',
             args: ['-y', '@modelcontextprotocol/server-memory'],
+            env: process.env
         });
         this.memoryClient = new Client({ name: 'workflow-demo-agent', version: '1.0.0' }, { capabilities: {} });
         await this.memoryClient.connect(memoryTransport);
@@ -78,7 +97,7 @@ export class WorkflowDemoAgent {
             const orchestrationResult = await this.agentOrchestrationClient.callTool({
                 name: 'generate_orchestration_card',
                 arguments: {
-                    user_request: userQuery,
+                    query: userQuery,
                     generation_mode: 'delegate_to_caller',
                     store_in_memory: true,
                 },

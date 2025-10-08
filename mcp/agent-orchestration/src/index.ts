@@ -221,7 +221,7 @@ class AgentOrchestrationServer {
         query, 
         gaff_config, 
         primary_agent_context, 
-        generation_mode = 'delegate_to_caller',
+        generation_mode = 'use_configured_api',
         store_in_memory 
       } = args;
       

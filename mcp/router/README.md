@@ -3,8 +3,8 @@
 > The execution engine of GAFF - runs intent graphs with parallel execution, HITL support, and quality integration
 
 **Part of [GAFF Framework](https://github.com/seanpoyner/gaff)** - Open-source AI agent orchestration  
-**Status:** ✅ Working (Scaffolded - Basic Execution)  
-**Version:** 1.0.0  
+**Status:** ✅ Production-Ready  
+**Version:** 1.0.3  
 **Pipeline Position:** Step 4 - Intent Graph Execution  
 **Confluence:** [router Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580103344)
 

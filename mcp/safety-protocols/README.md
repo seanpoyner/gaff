@@ -1,6 +1,16 @@
 # safety-protocols MCP Server
 
-**Purpose:** Guardrails, compliance enforcement, and safety checks for GAFF workflows
+> Guardrails, compliance enforcement, and safety checks for GAFF workflows
+
+**Part of [GAFF Framework](https://github.com/seanpoyner/gaff)** - Open-source AI agent orchestration  
+**Status:** ✅ Working (Scaffolded - Basic Implementation)  
+**Version:** 1.0.0  
+**Pipeline Position:** Step 2 - Safety & Compliance Validation  
+**Confluence:** [safety-protocols Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580103571)
+
+**⭐ Recommended:** Use [gaff-gateway](../gaff-gateway/) to access this and all other GAFF servers through a single connection.
+
+---
 
 ## Overview
 
@@ -14,6 +24,7 @@ The `safety-protocols` MCP server provides comprehensive safety and compliance e
 ✅ **Rate Limiting:** Per-user, per-IP, and per-endpoint rate limiting  
 ✅ **Input/Output Validation:** Size limits, format checks, and schema enforcement  
 ✅ **Audit Logging:** Comprehensive audit trails for compliance requirements  
+🌐 **Gateway Compatible:** Accessible via gaff-gateway with `safety_*` prefix  
 
 ## Tools
 

@@ -1,6 +1,16 @@
 # quality-check MCP Server
 
-**Purpose:** Quality validation, scoring, and automatic rerun strategy determination for GAFF workflows
+> Quality validation, scoring, and automatic rerun strategy determination for GAFF workflows
+
+**Part of [GAFF Framework](https://github.com/seanpoyner/gaff)** - Open-source AI agent orchestration  
+**Status:** ✅ Working (Scaffolded - Basic Validation)  
+**Version:** 1.0.0  
+**Pipeline Position:** Step 5 - Quality Validation & Rerun Strategy  
+**Confluence:** [quality-check Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580458458)
+
+**⭐ Recommended:** Use [gaff-gateway](../gaff-gateway/) to access this and all other GAFF servers through a single connection.
+
+---
 
 ## Overview
 
@@ -9,11 +19,12 @@ The `quality-check` MCP server validates execution results from the router, calc
 ## Features
 
 ✅ **Result Validation:** Comprehensive validation against quality criteria  
-✅ **Quality Scoring:** 0-1 scale scoring with configurable thresholds  
+✅ **Quality Scoring:** 0-1 scale scoring with configurable thresholds (default 0.85)  
 ✅ **Completeness Checks:** Verify all required outputs are present  
 ✅ **Accuracy Verification:** Validate correctness of results  
 ✅ **Rerun Strategy:** Intelligent decisions on partial/full/adaptive reruns  
 ✅ **Failure Analysis:** Identify patterns and root causes  
+🌐 **Gateway Compatible:** Accessible via gaff-gateway with `quality_*` prefix  
 
 ---
 

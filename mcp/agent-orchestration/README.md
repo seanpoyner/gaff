@@ -2,29 +2,37 @@
 
 > 🎭 Convert natural language queries into structured orchestration cards for multi-agent workflows
 
-[![npm version](https://img.shields.io/npm/v/agent-orchestration-mcp-server.svg)](https://www.npmjs.com/package/agent-orchestration-mcp-server)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![MCP Protocol](https://img.shields.io/badge/MCP-1.0.4-blue.svg)](https://modelcontextprotocol.io)
+[![Status](https://img.shields.io/badge/Status-Working-green.svg)](https://github.com/seanpoyner/gaff)
 
-Part of the [GAFF (Graphical Agentic Flow Framework)](https://github.com/seanpoyner/gaff) ecosystem - an open-source orchestration framework for AI agents.
+**Part of [GAFF Framework](https://github.com/seanpoyner/gaff)** - Open-source AI agent orchestration  
+**Status:** ✅ Working (Scaffolded - Delegate to Caller Mode)  
+**Version:** 1.0.0  
+**Pipeline Position:** Step 1 - Natural Language → Orchestration Card  
+**Confluence:** [agent-orchestration Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580103320)
 
 ## What is Agent Orchestration?
 
 Agent Orchestration is an MCP server that acts as the **"intent interpreter"** for AI agent workflows. It takes natural language queries and converts them into structured **orchestration cards** that can be used to generate executable intent graphs.
 
+**GAFF Pipeline:**
 ```
-Natural Language → Orchestration Card → Intent Graph → Execution
-     (You)              (This MCP)         (intent-graph)    (router)
+Natural Language → Orchestration Card → Safety Check → Intent Graph → Execution → Quality Check
+     (You)           (THIS SERVER)      (safety)       (intent-graph)    (router)    (quality)
 ```
+
+**⭐ Recommended:** Use [gaff-gateway](../gaff-gateway/) to access this and all other GAFF servers through a single connection.
 
 ## Features
 
-- 🧠 **Multi-LLM Support** - Writer AI, OpenAI, Anthropic, Azure OpenAI
+- 🧠 **No API Key Required** - Uses delegate_to_caller mode by default (leverages Claude/Cursor's LLM)
 - 📋 **5 Powerful Tools** - Generate, validate, list, query, and store orchestration cards
 - ✅ **Automatic Validation** - Ensures cards match available agents in `gaff.json`
 - 🎯 **Capability Matching** - Intelligently selects agents based on capabilities
-- 💾 **Memory Integration** - Optional storage in memory MCP server
+- 💾 **Memory Integration** - Optional storage in memory MCP server (future)
 - 🔧 **Standalone or Integrated** - Use independently or as part of GAFF
+- 🌐 **Gateway Compatible** - Accessible via gaff-gateway with `orchestration_*` prefix
 
 ## Installation
 

@@ -1,25 +1,41 @@
 # GAFF Gateway
 
+**⭐ The Recommended Way to Use GAFF**
+
 **Single Entry Point to All GAFF MCP Servers**
 
-The GAFF Gateway provides unified access to all GAFF MCP servers through a single connection, aggregating 17+ tools from 9 different servers.
+The GAFF Gateway provides unified access to all GAFF MCP servers through a single connection, aggregating 17+ tools from 9 different servers. This is the **easiest and recommended approach** for using the GAFF framework.
+
+**Status:** ✅ Production-Ready  
+**Version:** 1.0.0  
+**Part of:** [GAFF Framework](https://github.com/seanpoyner/gaff)  
+**Confluence:** [gaff-gateway Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2582482119)
 
 ## Why Use the Gateway?
 
 ### Benefits
-1. **Single Connection**: Connect once, access everything
-2. **Simplified Configuration**: One server vs 9 separate configurations
-3. **Unified Namespace**: All tools with clear prefixes
-4. **High-Level Workflows**: Compose multi-server workflows easily
-5. **Out-of-the-Box Functionality**: Includes sandbox, thinking, memory
+1. **Single Connection**: Connect once, access everything - 90% less configuration
+2. **Simplified Setup**: One server vs 9 separate configurations (5 lines vs 40+)
+3. **Unified Namespace**: All tools with clear prefixes (memory_, graph_, router_, etc.)
+4. **High-Level Workflows**: Single tool call for complete orchestration pipelines
+5. **Out-of-the-Box**: Includes official Anthropic MCP servers (memory, sandbox, thinking)
+6. **Smart Routing**: Automatically forwards calls to appropriate servers
+7. **Production Ready**: Built for enterprise reliability and scale
 
 ### What You Get
 
-- ✅ **9 MCP Servers**: All GAFF components in one place
-- ✅ **17+ Tools**: Full GAFF workflow + utilities
-- ✅ **Smart Routing**: Automatic tool → server mapping
-- ✅ **Official Servers**: Memory, sandbox, sequential-thinking via npx
-- ✅ **End-to-End Workflow**: Single tool call for complete orchestration
+**9 MCP Servers Unified:**
+- ✅ **agent-orchestration** (5 tools) - NL → Orchestration cards
+- ✅ **safety-protocols** (6 tools) - Compliance & guardrails
+- ✅ **intent-graph-generator** (7 tools) - Cards → Intent graphs
+- ✅ **router** (7 tools) - Intent graph execution
+- ✅ **quality-check** (6 tools) - Result validation
+- ✅ **memory** (9 tools) - Knowledge graph (official MCP)
+- ✅ **sandbox** (1 tool) - Code execution (official MCP)
+- ✅ **sequential-thinking** (1 tool) - Reasoning (official MCP)
+- ✅ **tools** (7 tools) - Utilities & HITL
+
+**Total: 17+ tools accessible through one connection**
 
 ## Quick Start
 

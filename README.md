@@ -2,7 +2,7 @@
 
 **Version:** 1.0.0  
 **Author:** Sean Poyner  
-**License:** MIT  
+**License:** MIT ([See OPEN_SOURCE.md](OPEN_SOURCE.md))  
 **Status:** Open Source
 
 ---
@@ -13,11 +13,30 @@
 
 ### What Makes GAFF Different?
 
-✅ **Quality-First:** Built-in quality agent that validates results and triggers automatic reruns  
-✅ **Safety-First:** Dedicated safety & protocols MCP server for guardrails and compliance  
-✅ **Production-Ready:** Comprehensive testing, validation, and error handling  
+✅ **Quality-First:** Built-in quality validation that automatically triggers reruns when results don't meet standards  
+✅ **Safety-First:** Dedicated safety & protocols MCP server for guardrails, PII detection, and compliance  
+✅ **Production-Ready:** Comprehensive testing, validation, and error handling throughout  
 ✅ **MCP-Native:** Built entirely on the Model Context Protocol standard  
 ✅ **LLM-Powered:** Intelligent orchestration card and intent graph generation  
+✅ **Human-in-the-Loop:** Native support for pausing workflows for human approval  
+✅ **Single Gateway:** Access all 17+ tools from 9 servers through one connection
+
+### Current Status (October 2025)
+
+| Component | Status | Description |
+|-----------|--------|-------------|
+| **gaff-gateway** | ✅ Production | Unified entry point (⭐ Recommended) |
+| **intent-graph-generator** | ✅ Production | Published to npm v2.2.3 |
+| **agent-orchestration** | ✅ Working | Scaffolded, delegate-to-caller mode |
+| **router** | ✅ Working | Scaffolded, basic execution |
+| **quality-check** | ✅ Working | Scaffolded, basic validation |
+| **safety-protocols** | ✅ Working | Scaffolded, basic safety checks |
+| **tools** | ✅ Working | Scaffolded, basic utilities + HITL |
+| **memory** | ✅ Production | Official Anthropic MCP server |
+| **sandbox** | ✅ Production | Official Anthropic MCP server |
+| **sequential-thinking** | ✅ Production | Official Anthropic MCP server |
+
+**Confluence Documentation:** [GAFF Framework Complete Docs](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2583398840)  
 
 ### Architecture Components
 
@@ -88,43 +107,73 @@ Both use the **same GAFF Gateway**, providing consistent tool access and behavio
 
 ---
 
-## GAFF Components
+## Quick Start
 
-### 0. GAFF Gateway (⭐ **Recommended Entry Point**)
-**Purpose:** Single unified entry point to all GAFF MCP servers  
-**Status:** ✅ Production-Ready  
-**Tools:** 17+ tools from 9 servers
+### ⭐ Option 1: GAFF Gateway (Recommended)
 
-**Why Use the Gateway:**
-- ✅ **Single Connection** - Access all GAFF functionality through one server
-- ✅ **Simplified Config** - One MCP server vs 9 separate configurations
-- ✅ **Out-of-the-Box** - Includes sandbox, thinking, memory automatically
-- ✅ **Smart Routing** - Automatically routes tool calls to appropriate servers
-- ✅ **High-Level Workflows** - `gaff_create_and_execute_workflow` for end-to-end orchestration
+The **easiest way to use GAFF** - single connection, all functionality:
 
-**Quick Start:**
+```bash
+# Build the gateway
+cd gaff/mcp/gaff-gateway
+npm install
+npm run build
+
+# Configure Cursor or Claude Desktop
+```
+
+Add to your MCP configuration (`~/.cursor/mcp.json` or `~/Library/Application Support/Claude/claude_desktop_config.json`):
+
 ```json
 {
   "mcpServers": {
     "gaff-gateway": {
       "command": "node",
-      "args": ["C:/Users/seanp/projects/gaff/mcp/gaff-gateway/build/index.js"]
+      "args": ["/absolute/path/to/gaff/mcp/gaff-gateway/build/index.js"],
+      "env": {
+        "GAFF_CONFIG_PATH": "/absolute/path/to/gaff/gaff.json"
+      }
     }
   }
 }
 ```
 
-**All Available Tools:**
+**Benefits:**
+- ✅ **1 connection** instead of 9 separate servers
+- ✅ **90% less configuration** 
+- ✅ **17+ tools** immediately available
+- ✅ **High-level workflows** via `gaff_create_and_execute_workflow`
+- ✅ **Smart routing** to appropriate servers
+- ✅ **Official MCP servers** bundled (memory, sandbox, thinking)
+
+**Test it:**
+```javascript
+// In Cursor/Claude, ask:
+"Use gaff_create_and_execute_workflow to process customer service requests"
+```
+
+---
+
+## GAFF Components
+
+### 0. GAFF Gateway (⭐ **Recommended Entry Point**)
+**Purpose:** Single unified entry point to all GAFF MCP servers  
+**Status:** ✅ Production-Ready  
+**Location:** `mcp/gaff-gateway/`  
+**Tools:** 17+ tools from 9 servers  
+**Confluence:** [gaff-gateway Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2582482119)
+
+**What It Provides:**
 - `gaff_create_and_execute_workflow` - Complete NL → Execution workflow
-- `memory_*` - Knowledge graph operations (9 tools)
-- `sandbox_execute_code` - Safe Python/JavaScript/Shell execution
-- `thinking_sequential` - Step-by-step reasoning
-- `orchestration_*` - Natural language processing (2 tools)
+- `memory_*` - Knowledge graph operations (9 tools, official MCP)
+- `sandbox_execute_code` - Safe Python/JavaScript/Shell execution (official MCP)
+- `thinking_sequential` - Step-by-step reasoning (official MCP)
+- `orchestration_*` - Natural language → orchestration cards (5 tools)
 - `graph_*` - Intent graph generation & visualization (7 tools)
-- `router_*` - Execution engine (2 tools)
-- `quality_*` - Quality validation (1 tool)
-- `safety_*` - Compliance & guardrails (2 tools)
-- `tools_*` - Utilities & HITL (2 tools)
+- `router_*` - Execution engine (7 tools)
+- `quality_*` - Quality validation (6 tools)
+- `safety_*` - Compliance & guardrails (6 tools)
+- `tools_*` - Utilities & HITL (7 tools)
 
 **Documentation:** [mcp/gaff-gateway/README.md](mcp/gaff-gateway/README.md)
 
@@ -209,117 +258,162 @@ Both use the **same GAFF Gateway**, providing consistent tool access and behavio
 
 ### 4. agent-orchestration MCP Server
 **Purpose:** Natural language to orchestration card conversion  
-**Status:** 🚧 In Development
+**Status:** ✅ Working (Scaffolded - Delegate to Caller Mode)  
+**Location:** `mcp/agent-orchestration/`  
+**Confluence:** [agent-orchestration Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580103320)
 
-**Tools:**
-- `generate_orchestration_card` - Convert NL query to orchestration card
-- `validate_orchestration_card` - Validate card structure
-- `list_agents` - List available agents from gaff.json
-- `get_agent_capabilities` - Get specific agent details
-- `store_card` - Store card in memory MCP (if available)
-
-**Input:** Natural language query + gaff.json context  
-**Output:** Orchestration card for intent-graph-generator
-
----
-
-### 3. safety-protocols MCP Server
-**Purpose:** Guardrails, compliance, and safety enforcement  
-**Status:** 🚧 In Development
-
-**Tools:**
-- `validate_compliance` - Check compliance requirements (GDPR, CCPA, etc)
-- `check_guardrails` - Enforce guardrails (PII detection, content filtering)
-- `validate_input` - Pre-execution input validation
-- `validate_output` - Post-execution output validation
-- `enforce_rate_limits` - Rate limiting enforcement
-- `audit_log` - Security audit logging
+**Tools (5):**
+- `orchestration_generate_card` - Convert NL query to orchestration card
+- `orchestration_validate_card` - Validate card structure
+- `orchestration_list_agents` - List available agents from gaff.json
+- `orchestration_get_agent_capabilities` - Get specific agent details
+- `orchestration_store_card` - Store card in memory MCP (future)
 
 **Key Features:**
-- PII detection and masking
-- Content filtering for safe outputs
-- Regulatory compliance checks
-- Input/output size limits
-- Rate limiting per user/IP/endpoint
-- Audit trail for compliance
+- ✅ **No API Key Required** - Uses delegate_to_caller mode by default
+- ✅ **Automatic Agent Selection** - Reads gaff.json for available agents
+- ✅ **Capability Matching** - Intelligently selects agents
+- ✅ **Comprehensive Validation** - Ensures cards match gaff.json
+
+**Documentation:** [mcp/agent-orchestration/README.md](mcp/agent-orchestration/README.md)
 
 ---
 
-### 4. intent-graph-generator MCP Server
-**Purpose:** Orchestration card to intent graph conversion  
-**Status:** ✅ Production-Ready (v2.2.3)
+### 5. safety-protocols MCP Server
+**Purpose:** Guardrails, compliance, and safety enforcement  
+**Status:** ✅ Working (Scaffolded - Basic Implementation)  
+**Location:** `mcp/safety-protocols/`  
+**Confluence:** [safety-protocols Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580103571)
 
-**npm:** `intent-graph-mcp-server@2.2.3`  
+**Tools (6):**
+- `safety_validate_compliance` - Check compliance (GDPR, CCPA, SOC2)
+- `safety_check_guardrails` - PII detection, content filtering
+- `safety_validate_input` - Pre-execution input validation
+- `safety_validate_output` - Post-execution output validation
+- `safety_enforce_rate_limits` - Rate limiting enforcement
+- `safety_audit_log` - Security audit logging
+
+**Key Features:**
+- ✅ **PII Detection** - Email, phone, SSN, credit cards
+- ✅ **Content Filtering** - Unsafe content detection
+- ✅ **Compliance Checks** - GDPR, CCPA, SOC2 validation
+- ✅ **Rate Limiting** - Per user/IP/endpoint
+- ✅ **Audit Logging** - Comprehensive trails
+
+**Documentation:** [mcp/safety-protocols/README.md](mcp/safety-protocols/README.md)
+
+---
+
+### 6. intent-graph-generator MCP Server
+**Purpose:** Orchestration card to intent graph conversion  
+**Status:** ✅ Production-Ready (v2.2.3 on npm)  
+**Location:** Published to npm: `intent-graph-mcp-server@2.2.3`  
 **GitHub:** https://github.com/seanpoyner/intent-graph-generator
 
-**Tools:** 7 comprehensive tools
-- `generate_intent_graph` - Generate graph from orchestration card
-- `validate_graph` - Comprehensive validation
-- `analyze_graph` - Complexity and optimization analysis
-- `optimize_graph` - Apply optimizations
-- `export_graph` - Export in multiple formats
-- `visualize_graph` - Generate Mermaid diagrams
-- `generate_artifacts` - Debugging artifacts
+**Tools (7):**
+- `graph_generate` - Generate intent graph from orchestration card
+- `graph_validate` - Comprehensive DAG validation
+- `graph_analyze` - Complexity and optimization analysis
+- `graph_optimize` - Apply optimizations (parallel execution, etc.)
+- `graph_export` - Export in multiple formats (JSON, YAML, etc.)
+- `graph_visualize` - Generate beautiful Mermaid diagrams
+- `graph_generate_artifacts` - Debugging artifacts
+
+**Key Features:**
+- ✅ **LLM-Powered Generation** - Intelligent graph creation
+- ✅ **Delegate to Caller Mode** - No API key required by default
+- ✅ **DAG Validation** - Ensures no cycles
+- ✅ **Parallel Execution** - Optimizes for concurrent execution
+- ✅ **Beautiful Visualizations** - Mermaid diagrams with colors
+
+**Installation:**
+```bash
+npx intent-graph-mcp-server@2.2.3
+```
+
+**Documentation:** [mcp/intent-graph-generator/README.md](mcp/intent-graph-generator/README.md)
 
 ---
 
-### 7. tools MCP Server (GAFF Tools)
+### 9. tools MCP Server (GAFF Tools)
 **Purpose:** Essential utility tools including human-in-the-loop  
-**Status:** 🚧 In Development
+**Status:** ✅ Working (Scaffolded - Basic Utilities)  
+**Location:** `mcp/tools/`
 
-**Package:** `gaff-tools-mcp-server`
-
-**Tools:** 7 essential utilities
-- 🚨 `human_in_the_loop` - **CRITICAL**: Pause execution for user approval
-- `format_data` - Convert between JSON, XML, YAML, CSV
-- `translate_schema` - Schema mapping and translation
-- `lint_data` - Validate data against schemas
-- `sanitize_data` - Clean and sanitize data (PII removal, etc.)
-- `convert_timestamp` - Timestamp format conversion
-- `count_tokens` - Token counting for cost estimation
+**Tools (7):**
+- 🚨 `tools_human_in_the_loop` - **CRITICAL**: Pause execution for user approval
+- `tools_format_data` - Convert between JSON, XML, YAML, CSV
+- `tools_translate_schema` - Schema mapping and translation
+- `tools_lint_data` - Validate data against schemas
+- `tools_sanitize_data` - Clean and sanitize data (PII removal, etc.)
+- `tools_convert_timestamp` - Timestamp format conversion
+- `tools_count_tokens` - Token counting for cost estimation
 
 **Key Feature - Human-in-the-Loop:**
-The HITL tool enables production-ready agentic systems by pausing intent graph execution to request user confirmation before critical actions like data deletions, financial transactions, or policy changes. The router must integrate with this tool to support approval workflows.
+✅ **Production-Critical** - Pauses workflows for human approval  
+✅ **Prevents Dangerous Actions** - Deletions, financial transactions, policy changes  
+✅ **Router Integration** - Seamless HITL support in execution engine  
+✅ **Configurable Timeouts** - Yes/No, multi-choice, or text input  
+
+**Documentation:** [mcp/tools/README.md](mcp/tools/README.md)
 
 ---
 
 ### 8. quality-check MCP Server
 **Purpose:** Quality validation, scoring, and rerun strategy determination  
-**Status:** 🚧 Scaffolded
+**Status:** ✅ Working (Scaffolded - Basic Validation)  
+**Location:** `mcp/quality-check/`  
+**Confluence:** [quality-check Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580458458)
 
-**Package:** `quality-check-mcp-server`
+**Tools (6):**
+- `quality_validate_result` - Comprehensive validation against criteria
+- `quality_score_quality` - Calculate quality score (0-1 scale)
+- `quality_check_completeness` - Verify all required outputs present
+- `quality_check_accuracy` - Validate correctness against rules
+- `quality_determine_rerun_strategy` - Decide partial/full/adaptive rerun
+- `quality_analyze_failure_patterns` - Identify patterns to improve workflows
 
-**Tools:** 6 quality assurance tools
-- `validate_execution_result` - Comprehensive validation against criteria
-- `score_quality` - Calculate quality score (0-1 scale)
-- `check_completeness` - Verify all required outputs present
-- `check_accuracy` - Validate correctness against rules
-- `determine_rerun_strategy` - Intelligently decide partial/full/adaptive rerun
-- `analyze_failure_patterns` - Identify patterns to improve workflows
+**Key Features:**
+- ✅ **Automatic Validation** - Validates results against configurable criteria
+- ✅ **Quality Scoring** - 0-1 scale with default threshold of 0.85
+- ✅ **Intelligent Reruns** - Partial, full, or adaptive rerun strategies
+- ✅ **Pattern Analysis** - Identifies failure patterns for improvement
+- ✅ **Router Integration** - Automatic coordination with router
 
-**Key Feature:**
-The router calls quality-check after executing intent graphs. If quality score < threshold (default 0.85), quality-check determines the best rerun strategy (partial/full/adaptive) and triggers reruns automatically.
+**How It Works:**
+The router calls quality-check after executing intent graphs. If quality score < threshold (default 0.85), quality-check determines the best rerun strategy and triggers reruns automatically.
+
+**Documentation:** [mcp/quality-check/README.md](mcp/quality-check/README.md)
 
 ---
 
-### 9. router MCP Server
+### 7. router MCP Server
 **Purpose:** Intent graph execution engine and agent routing  
-**Status:** 🚧 Scaffolded
+**Status:** ✅ Working (Scaffolded - Basic Execution)  
+**Location:** `mcp/router/`  
+**Confluence:** [router Documentation](https://marriottcloud.atlassian.net/wiki/spaces/AAD/pages/2580103344)
 
-**Package:** `router-mcp-server`
+**Tools (7):**
+- `router_execute_graph` - Execute complete intent graph with parallel support
+- `router_route_to_agent` - Route single request to specific agent
+- `router_get_execution_status` - Check async execution state
+- `router_pause_execution` - Pause for HITL or intervention
+- `router_resume_execution` - Resume after approval
+- `router_cancel_execution` - Cancel running execution
+- `router_rerun_nodes` - Re-execute specific nodes (quality-triggered)
 
-**Tools:** 7 execution tools
-- `execute_graph` - Execute complete intent graph with parallel execution
-- `route_to_agent` - Route single request to specific agent
-- `get_execution_status` - Check async execution state
-- `pause_execution` - Pause for HITL or intervention
-- `resume_execution` - Resume after approval
-- `cancel_execution` - Cancel running execution
-- `rerun_nodes` - Re-execute specific nodes (quality-triggered)
+**Key Features:**
+- ✅ **Topological Sort** - Determines optimal execution order
+- ✅ **Parallel Execution** - Executes independent nodes concurrently
+- ✅ **HITL Support** - Human-in-the-loop approval workflows
+- ✅ **Quality Integration** - Automatic coordination with quality-check
+- ✅ **State Management** - Comprehensive execution tracking
 
 **Special Integrations:**
-- **HITL:** Detects `human_in_the_loop` nodes, pauses execution, notifies user, waits for approval, resumes based on decision
-- **Quality-Check:** Calls quality-check after execution, handles automatic reruns if quality fails
+- **HITL:** Detects `human_in_the_loop` nodes, pauses execution, waits for approval
+- **Quality-Check:** Calls quality-check after execution, handles automatic reruns
+
+**Documentation:** [mcp/router/README.md](mcp/router/README.md)
 
 ---
 
